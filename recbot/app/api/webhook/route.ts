@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { neynarClient } from '@/app/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 type WebhookData = {
@@ -63,7 +64,10 @@ export async function POST(request: NextRequest) {
   }
   const webhookData: WebhookData = body;
   if(webhookData && webhookData.data.author.fid === botFid){
-    // Process
+    const newCast = await neynarClient.publishCast('SIGNER_UUID', 'Confirmed!', {
+        replyTo: webhookData.data.hash
+    });
+    console.log(`New cast: ${newCast.hash}`)
   }
   return NextResponse.json({ success: true });
 }
