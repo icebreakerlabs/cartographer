@@ -56,7 +56,21 @@ type WebhookData = {
 };
 
 export async function POST(request: NextRequest) {
-  // TODO: move botUsername and botFid to `consts.ts`
+  const acceptedCredentialsAndSkills = [
+    "Skill: Product",
+    "Skill: Design",
+    "Skill: Engineering",
+    "Skill: Marketing",
+    "Skill: Legal",
+    "Skill: Finance",
+    "Skill: Operations",
+    "Skill: Sales",
+    "Skill: Support",
+    "Skill: Talent",
+    "Skill: Data",
+    "qBuilder"
+  ];  
+
   const botUsername = "botUsername";
   const botFid = 823009;
   const body = await request.json();
@@ -64,17 +78,20 @@ export async function POST(request: NextRequest) {
     throw new Error('Invalid webhook data');
   }
   const webhookData: WebhookData = body;
-  // TODO: expand on RegExp params when we have a set list of attestations/badges that can be given out
   if (
     webhookData &&
     webhookData.data.author.fid === botFid &&
-    new RegExp(`^@${botUsername} \\S+ \\S+`).test(webhookData.data.text)
+    new RegExp(`^@${botUsername} \\S+ (${acceptedCredentialsAndSkills.join('|')})$`).test(webhookData.data.text)
   ) {
     const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Confirmed!', {
       replyTo: webhookData.data.hash,
     });
-    // TODO: call the Icebreaker POST route here, Promise.all this whole part
     console.log(`New cast: ${newCast.hash}`);
+  } else {
+    const failedEventCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed, invalid format', {
+      replyTo: webhookData.data.hash,
+    });
+    console.log(`New failed event cast: ${failedEventCast.hash}`);
   }
   return NextResponse.json({ success: true });
 }
