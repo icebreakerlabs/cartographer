@@ -1,98 +1,53 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { neynarClient } from '@/app/lib/utils';
 import { NextRequest, NextResponse } from 'next/server';
-
-type WebhookData = {
-  created_at: number;
-  type: string;
-  data: {
-    object: string;
-    hash: string;
-    author: {
-      object: string;
-      fid: number;
-      username: string;
-      display_name: string;
-      pfp_url: string;
-      custody_address: string;
-      profile: {
-        bio: {
-          text: string;
-        };
-      };
-      follower_count: number;
-      following_count: number;
-      verifications: any[];
-      verified_addresses: {
-        eth_addresses: string[];
-        sol_addresses: string[];
-      };
-      verified_accounts: any | null;
-      power_badge: boolean;
-    };
-    thread_hash: string;
-    parent_hash: string | null;
-    parent_url: string | null;
-    root_parent_url: string | null;
-    parent_author: {
-      fid: number | null;
-    };
-    text: string;
-    timestamp: string;
-    embeds: any[];
-    channel: string | null;
-    reactions: {
-      likes_count: number;
-      recasts_count: number;
-      likes: any[];
-      recasts: any[];
-    };
-    replies: {
-      count: number;
-    };
-    mentioned_profiles: any[];
-    event_timestamp: string;
-  };
-};
+import { neynarClient } from '@/app/lib/utils';
+import { verifyWebhookSignature } from '@/app/lib/webhook';
+import { type WebhookData } from '@/app/lib/types';
 
 export async function POST(request: NextRequest) {
-  const acceptedCredentialsAndSkills = [
-    "Skill: Product",
-    "Skill: Design",
-    "Skill: Engineering",
-    "Skill: Marketing",
-    "Skill: Legal",
-    "Skill: Finance",
-    "Skill: Operations",
-    "Skill: Sales",
-    "Skill: Support",
-    "Skill: Talent",
-    "Skill: Data",
-    "qBuilder"
-  ];  
+  try {
+    const body = await verifyWebhookSignature(request);
+    const payload: WebhookData = JSON.parse(body);
+    const type = payload.type;
+    const data = payload.data;
 
-  const botUsername = "rec";
-  // const botFid = 12571;
-  const body = await request.json();
-  if (!body || typeof body !== 'object' || !body.data) {
-    throw new Error('Invalid webhook data');
-  }
-  const webhookData: WebhookData = body;
-  const match = webhookData.data.text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
-  const isValidSkill = match && acceptedCredentialsAndSkills.includes(match[1]);
+    if (type !== 'cast.created' || !data) {
+      console.error('Invalid webhook payload:', payload);
+      return new NextResponse('Invalid webhook payload', { status: 400 });
+    }
 
-  if (
-    webhookData &&
-    isValidSkill
-  ) {
-    const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
-      replyTo: webhookData.data.hash,
-    });
-    console.log(`New cast: ${newCast.hash}`);
-  } else {
-    await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed. Too soon', {
-      replyTo: webhookData.data.hash,
-    });
+    const acceptedCredentialsAndSkills = [
+      "Skill: Product",
+      "Skill: Design",
+      "Skill: Engineering",
+      "Skill: Marketing",
+      "Skill: Legal",
+      "Skill: Finance",
+      "Skill: Operations",
+      "Skill: Sales",
+      "Skill: Support",
+      "Skill: Talent",
+      "Skill: Data",
+      "qBuilder"
+    ];  
+
+    const botUsername = "rec";
+    const match = data.text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
+    const isValidSkill = match && acceptedCredentialsAndSkills.includes(match[1]);
+
+    if (isValidSkill) {
+      const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
+        replyTo: data.hash,
+      });
+      console.log(`New cast: ${newCast.hash}`);
+    } else {
+      await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed. Too soon', {
+        replyTo: data.hash,
+      });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error handling webhook:', error);
+    return new NextResponse('Error handling webhook', { status: 500 });
   }
-  return NextResponse.json({ success: true });
 }
