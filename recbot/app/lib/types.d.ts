@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { type User } from "@neynar/nodejs-sdk/build/neynar-api/v2";
+
 export type WebhookData = {
     created_at: number;
     type: string;
@@ -48,7 +50,7 @@ export type WebhookData = {
       replies: {
         count: number;
       };
-      mentioned_profiles: any[];
+      mentioned_profiles: User[];
       event_timestamp: string;
     };
 };
