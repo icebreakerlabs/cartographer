@@ -78,20 +78,22 @@ export async function POST(request: NextRequest) {
     throw new Error('Invalid webhook data');
   }
   const webhookData: WebhookData = body;
+  const match = webhookData.data.text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
+  const isValidSkill = match && acceptedCredentialsAndSkills.includes(match[1]);
+
   if (
     webhookData &&
     webhookData.data.author.fid === botFid &&
-    new RegExp(`^@${botUsername} \\S+ (${acceptedCredentialsAndSkills.join('|')})$`).test(webhookData.data.text)
+    isValidSkill
   ) {
     const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Confirmed!', {
       replyTo: webhookData.data.hash,
     });
     console.log(`New cast: ${newCast.hash}`);
   } else {
-    const failedEventCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed, invalid format', {
+    await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed, invalid format', {
       replyTo: webhookData.data.hash,
     });
-    console.log(`New failed event cast: ${failedEventCast.hash}`);
   }
   return NextResponse.json({ success: true });
 }
