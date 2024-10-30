@@ -71,8 +71,8 @@ export async function POST(request: NextRequest) {
     "qBuilder"
   ];  
 
-  const botUsername = "botUsername";
-  const botFid = 823009;
+  const botUsername = "rec";
+  // const botFid = 12571;
   const body = await request.json();
   if (!body || typeof body !== 'object' || !body.data) {
     throw new Error('Invalid webhook data');
@@ -83,15 +83,14 @@ export async function POST(request: NextRequest) {
 
   if (
     webhookData &&
-    webhookData.data.author.fid === botFid &&
     isValidSkill
   ) {
-    const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Confirmed!', {
+    const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
       replyTo: webhookData.data.hash,
     });
     console.log(`New cast: ${newCast.hash}`);
   } else {
-    await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed, invalid format', {
+    await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed. Too soon', {
       replyTo: webhookData.data.hash,
     });
   }
