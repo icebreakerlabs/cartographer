@@ -8,7 +8,7 @@ export async function processWebhookBody(webhook: WebhookData) {
   const type = webhook.type;
   const data = webhook.data;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { author, mentioned_profiles } = data;
+  const { author, mentioned_profiles, parent_hash } = data;
 
   if (type !== 'cast.created' || !data) {
     throw new Error('Invalid webhook payload');
@@ -34,7 +34,9 @@ export async function processWebhookBody(webhook: WebhookData) {
   const mentionedUsernames = mentioned_profiles.map(profile => profile.username);
   const isValidSkill = match && acceptedCredentialsAndSkills.includes(match[1]) && mentionedUsernames.includes(match[0]);
 
-  if (isValidSkill) {
+  if (parent_hash) {
+    // Add logic here to check the parent cast if needed
+  } else if (isValidSkill) {
     const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
       replyTo: data.hash,
     });
