@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     webhookData.data.author.fid === botFid &&
     new RegExp(`^@${botUsername} \\S+ \\S+`).test(webhookData.data.text)
   ) {
-    const newCast = await neynarClient.publishCast('SIGNER_UUID', 'Confirmed!', {
+    const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Confirmed!', {
       replyTo: webhookData.data.hash,
     });
     // TODO: call the Icebreaker POST route here, Promise.all this whole part
