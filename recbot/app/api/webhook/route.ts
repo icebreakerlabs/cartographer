@@ -56,18 +56,25 @@ type WebhookData = {
 };
 
 export async function POST(request: NextRequest) {
-  // TODO: move botFid to be a global const
+  // TODO: move botUsername and botFid to `consts.ts`
+  const botUsername = "botUsername";
   const botFid = 823009;
   const body = await request.json();
   if (!body || typeof body !== 'object' || !body.data) {
     throw new Error('Invalid webhook data');
   }
   const webhookData: WebhookData = body;
-  if(webhookData && webhookData.data.author.fid === botFid){
+  // TODO: expand on RegExp params when we have a set list of attestations/badges that can be given out
+  if (
+    webhookData &&
+    webhookData.data.author.fid === botFid &&
+    new RegExp(`^@${botUsername} \\S+ \\S+`).test(webhookData.data.text)
+  ) {
     const newCast = await neynarClient.publishCast('SIGNER_UUID', 'Confirmed!', {
-        replyTo: webhookData.data.hash
+      replyTo: webhookData.data.hash,
     });
-    console.log(`New cast: ${newCast.hash}`)
+    // TODO: call the Icebreaker POST route here, Promise.all this whole part
+    console.log(`New cast: ${newCast.hash}`);
   }
   return NextResponse.json({ success: true });
 }
