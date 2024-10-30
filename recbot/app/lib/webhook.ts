@@ -34,14 +34,16 @@ export async function processWebhookBody(webhook: WebhookData) {
   const mentionedUsernames = mentioned_profiles.map(profile => profile.username);
   const isValidSkill = match && acceptedCredentialsAndSkills.includes(match[1]) && mentionedUsernames.includes(match[0]);
 
-  if (parent_hash) {
-    // Add logic here to check the parent cast if needed
-  } else if (isValidSkill) {
+   if (isValidSkill) {
     const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
       replyTo: data.hash,
     });
     console.log(`New cast: ${newCast.hash}`);
-  } else {
+  } else if(parent_hash){
+    // Add logic here to check the parent cast if needed
+    return { success: false };
+  }
+   else {
     await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed. Too soon', {
       replyTo: data.hash,
     });
