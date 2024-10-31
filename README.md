@@ -4,4 +4,4 @@ Repo of public resources for mapping across cryptographically verifiable data wi
 
 | Repo                   | Description                                     |
 |------------------------|-------------------------------------------------|
-| [recbot](/recbot)       | Next.js app to listen to/post Icebreaker recommendations from Farcaster casts  |
+| [recbot](/recbot)       | Next.js app to listen to Farcaster and post witnessable credentials to Icebreaker  |
