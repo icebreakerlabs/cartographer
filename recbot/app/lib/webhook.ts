@@ -1,54 +1,91 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
-import { type WebhookData } from './types';
+import { IcebreakerPOSTParams, type WebhookData } from './types';
 import { neynarClient } from './utils';
+import { isValidSkill } from './attestation-matcher';
+import { CastParamType } from '@neynar/nodejs-sdk';
+
+export async function extractEndorsementFromCast(webhook: WebhookData){
+  const isValid = isValidSkill(webhook.data.text, webhook.data.mentioned_profiles);
+  if(isValid.isValid){ 
+    const json: IcebreakerPOSTParams = {
+      attesterAddress: '',
+      attesteeAddress: '',
+      name: isValid.skill,
+      source: 'Farcaster',
+      reference: webhook.data.hash,
+      timestamp: webhook.data.timestamp,
+      uid: `${webhook.data.hash}000000000000000000000000`
+    }
+    try{
+      await Promise.all([
+        neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
+          replyTo: webhook.data.hash,
+        }),
+        fetch("https://icebreaker-cards-git-dev-icebreaker-labs.vercel.app/api/v1/credentials/store", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`
+          },
+          body: JSON.stringify(json)
+        })
+      ]);
+    } catch(err){
+      return (err as Error).message;
+    }
+  } else {
+    if(webhook.data.parent_hash){
+      const res = await neynarClient.lookupCastConversation(webhook.data.parent_hash, CastParamType.Hash);
+      const parent = res.conversation.cast;
+      const isParentValid = isValidSkill(parent.text, parent.mentioned_profiles);
+      if(isParentValid.isValid){ 
+        const json: IcebreakerPOSTParams = {
+          attesterAddress: '',
+          attesteeAddress: '',
+          name: isParentValid.skill,
+          source: 'Farcaster',
+          reference: parent.hash,
+          timestamp: parent.timestamp,
+          uid: `${parent.hash}000000000000000000000000`
+        }
+        try{
+          await Promise.all([
+            neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
+              replyTo: parent.hash,
+            }),
+            fetch("https://icebreaker-cards-git-dev-icebreaker-labs.vercel.app/api/v1/credentials/store", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`
+              },
+              body: JSON.stringify(json)
+            })
+          ]);
+        } catch(err){
+          return (err as Error).message;
+        }
+      }
+    }
+    try{
+      await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed. Too soon', {
+        replyTo: webhook.data.hash,
+      });
+    } catch(err){
+      return (err as Error).message;
+    }
+  }
+}
 
 export async function processWebhookBody(webhook: WebhookData) {
-  const type = webhook.type;
-  const data = webhook.data;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { author, mentioned_profiles, parent_hash } = data;
-
-  if (type !== 'cast.created' || !data) {
+  if (webhook.type !== 'cast.created' || !webhook.data) {
     throw new Error('Invalid webhook payload');
   }
 
-  const acceptedCredentialsAndSkills = [
-    "Skill: Product",
-    "Skill: Design",
-    "Skill: Engineering",
-    "Skill: Marketing",
-    "Skill: Legal",
-    "Skill: Finance",
-    "Skill: Operations",
-    "Skill: Sales",
-    "Skill: Support",
-    "Skill: Talent",
-    "Skill: Data",
-    "qBuilder"
-  ];
-
-  const botUsername = "rec";
-  const match = data.text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
-  const mentionedUsernames = mentioned_profiles.map(profile => profile.username);
-  const isValidSkill = match && acceptedCredentialsAndSkills.includes(match[1]) && mentionedUsernames.includes(match[0]);
-
-   if (isValidSkill) {
-    const newCast = await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
-      replyTo: data.hash,
-    });
-    console.log(`New cast: ${newCast.hash}`);
-  } else if(parent_hash){
-    // Add logic here to check the parent cast if needed
-    return { success: false };
-  }
-   else {
-    await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed. Too soon', {
-      replyTo: data.hash,
-    });
-  }
-
+  const result = await extractEndorsementFromCast(webhook);
+  console.log(result);
   return { success: true };
 }
 

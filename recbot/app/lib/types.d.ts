@@ -2,6 +2,24 @@
 
 import { type User } from "@neynar/nodejs-sdk/build/neynar-api/v2";
 
+export type IcebreakerPOSTParams = {
+  schemaID?: string;
+  attesterPKID?: string;
+  attesteePKID?: string;
+  attesterAddress?: string;
+  attesteeAddress?: string;
+  name?: string;
+  value?: string;
+  source?: string;
+  reference?: string;
+  chain?: ChainSlug;
+  timestamp?: number | string;
+  uid?: string;
+  isPublic?: boolean;
+  isRevoked?: boolean;
+  data?: string;
+};
+
 export type WebhookData = {
     created_at: number;
     type: string;
