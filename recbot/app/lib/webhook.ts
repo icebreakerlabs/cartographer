@@ -16,6 +16,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData){
     const json: IcebreakerPOSTParams = {
       attesterAddress: attesterAddress,
       attesteeAddress: attesteeAddress,
+      isPublic: true,
       name: skillResp.skill,
       schemaID: schema?.schemaID ?? '-1',
       source: 'Farcaster',
