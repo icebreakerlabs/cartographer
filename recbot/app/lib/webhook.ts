@@ -55,7 +55,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData){
             neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
               replyTo: parent.hash,
             }),
-            fetch("https://icebreaker-cards-git-dev-icebreaker-labs.vercel.app/api/v1/credentials/store", {
+            fetch("https://app.icebreaker.xyz/api/v1/credentials/store", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
