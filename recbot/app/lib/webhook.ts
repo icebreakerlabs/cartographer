@@ -2,17 +2,17 @@
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
 import { IcebreakerPOSTParams, type WebhookData } from './types';
-import { neynarClient } from './utils';
+import { ICEBREAKER_API_URL, neynarClient } from './utils';
 import { isValidSkill } from './attestation-matcher';
 import { CastParamType } from '@neynar/nodejs-sdk';
 
 export async function extractEndorsementFromCast(webhook: WebhookData){
-  const isValid = isValidSkill(webhook.data.text, webhook.data.mentioned_profiles);
-  if(isValid.isValid){ 
+  const skillResp = isValidSkill(webhook.data.text, webhook.data.mentioned_profiles);
+  if(skillResp.isValid){ 
     const json: IcebreakerPOSTParams = {
       attesterAddress: '',
       attesteeAddress: '',
-      name: isValid.skill,
+      name: skillResp.skill,
       source: 'Farcaster',
       reference: webhook.data.hash,
       timestamp: webhook.data.timestamp,
@@ -23,7 +23,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData){
         neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
           replyTo: webhook.data.hash,
         }),
-        fetch("https://icebreaker-cards-git-dev-icebreaker-labs.vercel.app/api/v1/credentials/store", {
+        fetch(`${ICEBREAKER_API_URL}/v1/credentials/store`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -55,7 +55,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData){
             neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
               replyTo: parent.hash,
             }),
-            fetch("https://app.icebreaker.xyz/api/v1/credentials/store", {
+            fetch(`${ICEBREAKER_API_URL}/v1/credentials/store`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
@@ -84,8 +84,7 @@ export async function processWebhookBody(webhook: WebhookData) {
     throw new Error('Invalid webhook payload');
   }
 
-  const result = await extractEndorsementFromCast(webhook);
-  console.log(result);
+  await extractEndorsementFromCast(webhook);
   return { success: true };
 }
 

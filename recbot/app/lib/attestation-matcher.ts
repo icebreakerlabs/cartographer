@@ -20,20 +20,22 @@ export const isValidSkill = (text: string, mentioned_profiles: User[]) => {
   const match = text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
   const mentionedUsernames = mentioned_profiles.map(
     (profile) => profile.username
-  );
-  const isValid =
-    match &&
-    attestationsAndSkills.includes(match[1]) &&
-    mentionedUsernames.includes(match[0])
-      ? true
-      : false;
+  ).filter((username) => username !== 'rec');
+
+  const skill = match ? match[1] : '';
+  const username = mentionedUsernames[0];
+  const validSkill = attestationsAndSkills.includes(skill);
+  const validUsername = mentionedUsernames.includes(username);
+  const isValid = match && validSkill && validUsername;
+  
   if (isValid && match) {
-    return {
-      mentionedUsername: match[0],
+    const returnObj = {
+      mentionedUsername: mentionedUsernames[0],
       skill: match[1],
       isValid: isValid,
     };
+    return returnObj;
   } else {
-    return { isValid: isValid };
+    return { mentionedUsername: '', skill: '', isValid: false };
   }
 };
