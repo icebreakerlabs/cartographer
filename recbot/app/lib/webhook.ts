@@ -2,17 +2,22 @@
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
 import { IcebreakerPOSTParams, type WebhookData } from './types';
-import { ICEBREAKER_API_URL, neynarClient } from './utils';
-import { isValidSkill } from './attestation-matcher';
+import { getEthAddressForUser, ICEBREAKER_API_URL, neynarClient } from './utils';
+import { attestationsAndSkills, isValidSkill } from './attestation-matcher';
 import { CastParamType } from '@neynar/nodejs-sdk';
 
 export async function extractEndorsementFromCast(webhook: WebhookData){
   const skillResp = isValidSkill(webhook.data.text, webhook.data.mentioned_profiles);
   if(skillResp.isValid){ 
+    const attesterAddress = getEthAddressForUser(webhook.data.author);
+    const attesteeUser = webhook.data.mentioned_profiles.find((profile) => profile.username === skillResp.mentionedUsername);
+    const attesteeAddress = attesteeUser ? getEthAddressForUser(attesteeUser) : '0x';
+    const schema = attestationsAndSkills.find((item) => item.name === skillResp.skill);
     const json: IcebreakerPOSTParams = {
-      attesterAddress: '',
-      attesteeAddress: '',
+      attesterAddress: attesterAddress,
+      attesteeAddress: attesteeAddress,
       name: skillResp.skill,
+      schemaID: schema?.schemaID ?? '-1',
       source: 'Farcaster',
       reference: webhook.data.hash,
       timestamp: webhook.data.timestamp,

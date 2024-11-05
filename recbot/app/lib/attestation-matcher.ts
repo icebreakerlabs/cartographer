@@ -1,18 +1,54 @@
 import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
 
 export const attestationsAndSkills = [
-  'Skill: Product',
-  'Skill: Design',
-  'Skill: Engineering',
-  'Skill: Marketing',
-  'Skill: Legal',
-  'Skill: Finance',
-  'Skill: Operations',
-  'Skill: Sales',
-  'Skill: Support',
-  'Skill: Talent',
-  'Skill: Data',
-  'qBuilder',
+  {
+    schemaID: '65', 
+    name: 'Skill: Product'
+  },
+  {
+    schemaID: '66', 
+    name: 'Skill: Design'
+  },
+  {
+    schemaID: '67', 
+    name: 'Skill: Engineering'
+  },
+  {
+    schemaID: '68', 
+    name: 'Skill: Marketing'
+  },
+  {
+    schemaID: '69', 
+    name: 'Skill: Legal'
+  },
+  {
+    schemaID: '70', 
+    name: 'Skill: Finance'
+  },
+  {
+    schemaID: '71', 
+    name: 'Skill: Operations'
+  },
+  {
+    schemaID: '72', 
+    name: 'Skill: Sales'
+  },
+  {
+    schemaID: '73', 
+    name: 'Skill: Support'
+  },
+  {
+    schemaID: '74', 
+    name: 'Skill: Talent'
+  },
+  {
+    schemaID: '75', 
+    name: 'Skill: Data'
+  },
+  {
+    schemaID: '20', 
+    name: 'qBuilder',
+  },
 ];
 
 export const isValidSkill = (text: string, mentioned_profiles: User[]) => {
@@ -24,10 +60,10 @@ export const isValidSkill = (text: string, mentioned_profiles: User[]) => {
 
   const skill = match ? match[1] : '';
   const username = mentionedUsernames[0];
-  const validSkill = attestationsAndSkills.includes(skill);
+  const validSkill = attestationsAndSkills.map((skill) => skill.name).includes(skill);
   const validUsername = mentionedUsernames.includes(username);
   const isValid = match && validSkill && validUsername;
-  
+
   if (isValid && match) {
     const returnObj = {
       mentionedUsername: mentionedUsernames[0],
