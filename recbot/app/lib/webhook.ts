@@ -4,7 +4,6 @@ import { type NextRequest } from 'next/server';
 import { IcebreakerPOSTParams, type WebhookData } from './types';
 import { getEthAddressForUser, ICEBREAKER_API_URL, neynarClient } from './utils';
 import { attestationsAndSkills, isValidSkill } from './attestation-matcher';
-import { CastParamType } from '@neynar/nodejs-sdk';
 
 export async function extractEndorsementFromCast(webhook: WebhookData){
   const skillResp = isValidSkill(webhook.data.text, webhook.data.mentioned_profiles);
@@ -41,40 +40,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData){
     } catch(err){
       return (err as Error).message;
     }
-  } else {
-    if(webhook.data.parent_hash){
-      const res = await neynarClient.lookupCastConversation(webhook.data.parent_hash, CastParamType.Hash);
-      const parent = res.conversation.cast;
-      const isParentValid = isValidSkill(parent.text, parent.mentioned_profiles);
-      if(isParentValid.isValid){ 
-        const json: IcebreakerPOSTParams = {
-          attesterAddress: '',
-          attesteeAddress: '',
-          name: isParentValid.skill,
-          source: 'Farcaster',
-          reference: parent.hash,
-          timestamp: parent.timestamp,
-          uid: `${parent.hash}000000000000000000000000`
-        }
-        try{
-          await Promise.all([
-            neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Success!', {
-              replyTo: parent.hash,
-            }),
-            fetch(`${ICEBREAKER_API_URL}/v1/credentials/store`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`
-              },
-              body: JSON.stringify(json)
-            })
-          ]);
-        } catch(err){
-          return (err as Error).message;
-        }
-      }
-    }
+  } 
+  else {
     try{
       await neynarClient.publishCast(process.env.NEYNAR_SIGNER_UUID ?? "", 'Failed. Too soon', {
         replyTo: webhook.data.hash,
