@@ -45,10 +45,10 @@ export const attestationsAndSkills = [
     schemaID: 'recbot:skill:data',
     name: 'Skill: Data',
   },
-  {
-    schemaID: 'recbot:endorsement:qBuilder',
-    name: 'qBuilder',
-  },
+  // {
+  //   schemaID: 'recbot:endorsement:qBuilder',
+  //   name: 'qBuilder',
+  // },
   {
     schemaID: 'recbot:endorsement:workedDirectlyWith',
     name: 'Worked directly with',
