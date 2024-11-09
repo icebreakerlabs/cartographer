@@ -61,7 +61,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     try {
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
-        'Failed. Too soon',
+        'Unable to store endorsement. Please make sure to tag a valid user and skill.',
         {
           replyTo: webhook.data.hash,
         }
