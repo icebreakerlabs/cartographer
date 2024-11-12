@@ -5,6 +5,7 @@ import { IcebreakerPOSTParams, type WebhookData } from './types';
 import {
   getEthAddressForUser,
   ICEBREAKER_API_URL,
+  ICEBREAKER_CREDENTIALS_URL,
   neynarClient,
 } from './utils';
 import { attestationsAndSkills, isValidSkill } from './attestation-matcher';
@@ -37,23 +38,29 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       uid: `${webhook.data.hash}000000000000000000000000`,
     };
     try {
-      await Promise.all([
-        neynarClient.publishCast(
-          process.env.NEYNAR_SIGNER_UUID ?? '',
-          'Success!',
-          {
-            replyTo: webhook.data.hash,
-          }
-        ),
-        fetch(`${ICEBREAKER_API_URL}/v1/credentials/store`, {
+      const response = await fetch(
+        `${ICEBREAKER_API_URL}/v1/credentials/store`,
+        {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
           },
           body: JSON.stringify(json),
-        }),
-      ]);
+        }
+      );
+
+      const encodedCredentialName = encodeURIComponent(skillResp.skill);
+
+      await neynarClient.publishCast(
+        process.env.NEYNAR_SIGNER_UUID ?? '',
+        response.ok
+          ? `Success! Visit ${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=givers&receivers=${attesteeAddress} to view on Icebreaker.`
+          : 'Beep boop. Something went wrong.',
+        {
+          replyTo: webhook.data.hash,
+        }
+      );
     } catch (err) {
       return (err as Error).message;
     }
