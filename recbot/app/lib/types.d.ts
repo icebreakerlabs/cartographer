@@ -2,7 +2,7 @@
 
 import { type User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
 
-export type IcebreakerPOSTParams = {
+export type IcebreakerStoreCredentialsParams = {
   schemaID?: string;
   attesterPKID?: string;
   attesteePKID?: string;

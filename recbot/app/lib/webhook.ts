@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
-import { IcebreakerPOSTParams, type WebhookData } from './types';
+import { type IcebreakerStoreCredentialsParams, type WebhookData } from './types';
 import {
   getEthAddressForUser,
   ICEBREAKER_API_URL,
@@ -26,7 +26,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     const schema = attestationsAndSkills.find(
       (item) => item.name === skillResp.skill
     );
-    const json: IcebreakerPOSTParams = {
+    const json: IcebreakerStoreCredentialsParams = {
       attesterAddress: attesterAddress,
       attesteeAddress: attesteeAddress,
       isPublic: true,
@@ -39,9 +39,9 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     };
     try {
       const response = await fetch(
-        `${ICEBREAKER_API_URL}/v1/credentials/store`,
+        `${ICEBREAKER_API_URL}/v1/credentials`,
         {
-          method: 'POST',
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
