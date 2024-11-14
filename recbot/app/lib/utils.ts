@@ -16,3 +16,16 @@ export const getEthAddressForUser = (user: User) => {
     return user.custody_address;
   }
 };
+
+export const getIcebreakerUserFromFCUser = async (fname: string) => {
+  if (fname) {
+    const response = await fetch(`${ICEBREAKER_API_URL}/api/fname?fname=${fname}`);
+    if (!response.ok) {
+      throw new Error('Error fetching data for fname');
+    }
+    const json = await response.json();
+    return json.profiles[0];
+  } else {
+    throw new Error('No fname or fid for the user provided');
+  }
+};

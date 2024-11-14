@@ -1,4 +1,6 @@
 import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
+import { getIcebreakerUserFromFCUser } from './utils';
+import { IcebreakerUser } from './types';
 
 export const attestationsAndSkills = [
   {
@@ -55,7 +57,15 @@ export const attestationsAndSkills = [
   },
 ];
 
-export const isValidSkill = (text: string, mentioned_profiles: User[]) => {
+export function hasCredential(credentialName?: string, credentials?: IcebreakerUser['credentials'], exact = false) {
+  if (!credentials || !credentialName) {
+    return false;
+  }
+
+  return credentials.some(({ name }) => (exact ? name === credentialName : name.startsWith(credentialName)));
+}
+
+export const isValidSkill = async(text: string, mentioned_profiles: User[]) => {
   const botUsername = 'rec';
   const match = text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
   const mentionedUsernames = mentioned_profiles
@@ -68,7 +78,9 @@ export const isValidSkill = (text: string, mentioned_profiles: User[]) => {
     .map((skill) => skill.name)
     .includes(skill);
   const validUsername = mentionedUsernames.includes(username);
-  const isValid = match && validSkill && validUsername;
+  const icebreakerUser = await getIcebreakerUserFromFCUser(username) as IcebreakerUser
+  const userHasCredential = hasCredential(skill, icebreakerUser.credentials);
+  const isValid = match && validSkill && validUsername && userHasCredential;
 
   if (isValid && match) {
     const returnObj = {

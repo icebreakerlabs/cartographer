@@ -11,7 +11,7 @@ import {
 import { attestationsAndSkills, isValidSkill } from './attestation-matcher';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
-  const skillResp = isValidSkill(
+  const skillResp = await isValidSkill(
     webhook.data.text,
     webhook.data.mentioned_profiles
   );
