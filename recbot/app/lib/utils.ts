@@ -1,5 +1,6 @@
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
+import { IcebreakerUser } from './types';
 
 export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
 
@@ -17,7 +18,7 @@ export const getEthAddressForUser = (user: User) => {
   }
 };
 
-export const getIcebreakerUserFromFCUser = async (fname: string) => {
+export const getIcebreakerUserFromFCUser = async (fname: string): Promise<IcebreakerUser> => {
   if (fname) {
     const response = await fetch(`${ICEBREAKER_API_URL}/api/fname?fname=${fname}`);
     if (!response.ok) {

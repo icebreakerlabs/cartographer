@@ -6,63 +6,90 @@ export const attestationsAndSkills = [
   {
     schemaID: 'recbot:skill:product',
     name: 'Skill: Product',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:design',
     name: 'Skill: Design',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:engineering',
     name: 'Skill: Engineering',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:marketing',
     name: 'Skill: Marketing',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:legal',
     name: 'Skill: Legal',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:finance',
     name: 'Skill: Finance',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:operations',
     name: 'Skill: Operations',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:sales',
     name: 'Skill: Sales',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:support',
     name: 'Skill: Support',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:talent',
     name: 'Skill: Talent',
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:data',
     name: 'Skill: Data',
+    allowRecursion: false,
   },
   // {
   //   schemaID: 'recbot:endorsement:qBuilder',
   //   name: 'qBuilder',
+  //   allowRecursion: true,
   // },
   {
     schemaID: 'recbot:endorsement:workedDirectlyWith',
     name: 'Worked directly with',
+    allowRecursion: false,
+  },
+  {
+    schemaID: 'recbot:endorsement:human',
+    name: 'Human',
+    allowRecursion: true,
   },
 ];
 
-export function hasCredential(credentialName?: string, credentials?: IcebreakerUser['credentials'], exact = false) {
+export function hasCredential(credentialName?: string, credentials?: IcebreakerUser['credentials']) {
   if (!credentials || !credentialName) {
     return false;
   }
 
-  return credentials.some(({ name }) => (exact ? name === credentialName : name.startsWith(credentialName)));
+  const skill = attestationsAndSkills.find(skill => skill.name === credentialName);
+  if (skill) {
+    // If the skill isn't recursive, return true because anyone can do it  
+    if (!skill.allowRecursion) {
+      return true;
+    }
+  }
+
+  // Otherwise, proceed to check if the user has the recursive credential
+  return credentials.some(({ name }) => name.startsWith(credentialName));
 }
 
 export const isValidSkill = async(text: string, mentioned_profiles: User[]) => {
@@ -78,7 +105,7 @@ export const isValidSkill = async(text: string, mentioned_profiles: User[]) => {
     .map((skill) => skill.name)
     .includes(skill);
   const validUsername = mentionedUsernames.includes(username);
-  const icebreakerUser = await getIcebreakerUserFromFCUser(username) as IcebreakerUser
+  const icebreakerUser = await getIcebreakerUserFromFCUser(username)
   const userHasCredential = hasCredential(skill, icebreakerUser.credentials);
   const isValid = match && validSkill && validUsername && userHasCredential;
 
