@@ -1,6 +1,6 @@
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { IcebreakerUser } from './types';
+import { IcebreakerProfile } from './types';
 
 export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
 
@@ -18,9 +18,13 @@ export const getEthAddressForUser = (user: User) => {
   }
 };
 
-export const getIcebreakerUserFromFCUser = async (fname: string): Promise<IcebreakerUser> => {
+export const getIcebreakerProfileFromFname = async (
+  fname: string
+): Promise<IcebreakerProfile> => {
   if (fname) {
-    const response = await fetch(`${ICEBREAKER_API_URL}/api/fname?fname=${fname}`);
+    const response = await fetch(
+      `${ICEBREAKER_API_URL}/api/fname?fname=${fname}`
+    );
     if (!response.ok) {
       throw new Error('Error fetching data for fname');
     }

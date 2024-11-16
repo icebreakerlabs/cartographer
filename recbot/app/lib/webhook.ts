@@ -1,36 +1,39 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
-import { type IcebreakerStoreCredentialsParams, type WebhookData } from './types';
+import {
+  type IcebreakerStoreCredentialsParams,
+  type WebhookData,
+} from './types';
 import {
   getEthAddressForUser,
   ICEBREAKER_API_URL,
   ICEBREAKER_CREDENTIALS_URL,
   neynarClient,
 } from './utils';
-import { attestationsAndSkills, isValidSkill } from './attestation-matcher';
+import { attestationsSchemas, isValidRec } from './attestation-matcher';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
-  const skillResp = await isValidSkill(
+  const recResp = await isValidRec(
     webhook.data.text,
     webhook.data.mentioned_profiles
   );
-  if (skillResp.isValid) {
+  if (recResp.isValid) {
     const attesterAddress = getEthAddressForUser(webhook.data.author);
     const attesteeUser = webhook.data.mentioned_profiles.find(
-      (profile) => profile.username === skillResp.mentionedUsername
+      (profile) => profile.username === recResp.mentionedUsername
     );
     const attesteeAddress = attesteeUser
       ? getEthAddressForUser(attesteeUser)
       : '0x';
-    const schema = attestationsAndSkills.find(
-      (item) => item.name === skillResp.skill
+    const schema = attestationsSchemas.find(
+      (schema) => schema.name === recResp.schemaName
     );
     const json: IcebreakerStoreCredentialsParams = {
       attesterAddress: attesterAddress,
       attesteeAddress: attesteeAddress,
       isPublic: true,
-      name: skillResp.skill,
+      name: recResp.schemaName,
       schemaID: schema?.schemaID ?? '-1',
       source: 'Farcaster',
       reference: webhook.data.hash,
@@ -38,19 +41,16 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       uid: `${webhook.data.hash}000000000000000000000000`,
     };
     try {
-      const response = await fetch(
-        `${ICEBREAKER_API_URL}/v1/credentials`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
-          },
-          body: JSON.stringify(json),
-        }
-      );
+      const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
+        },
+        body: JSON.stringify(json),
+      });
 
-      const encodedCredentialName = encodeURIComponent(skillResp.skill);
+      const encodedCredentialName = encodeURIComponent(recResp.schemaName);
 
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
@@ -68,7 +68,9 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     try {
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
-        'Unable to store endorsement. Please make sure to tag a valid user and skill.',
+        recResp.schemaName
+          ? `You must receive an endorsement for ${recResp.schemaName} before you can endorse others.`
+          : 'Unable to endorse. Make sure to format with: (at)rec (at)<username> <endorsement>',
         {
           replyTo: webhook.data.hash,
         }
