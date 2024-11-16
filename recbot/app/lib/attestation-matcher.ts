@@ -116,7 +116,10 @@ async function canFnameAttestToSchema(
   }
   if (schema.allowRecursion) {
     const icebreakerProfile = await getIcebreakerProfileFromFname(fname);
-    return hasCredential(schema.name, icebreakerProfile.credentials);
+    return (
+      !!icebreakerProfile &&
+      hasCredential(schema.name, icebreakerProfile.credentials)
+    );
   }
   return false;
 }

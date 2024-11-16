@@ -4,6 +4,8 @@ import { IcebreakerProfile } from './types';
 
 export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
 export const ICEBREAKER_CREDENTIALS_URL =
   'https://app.icebreaker.xyz/credentials';
 export const neynarClient = new NeynarAPIClient(
@@ -18,19 +20,25 @@ export const getEthAddressForUser = (user: User) => {
   }
 };
 
+type ProfileResponse = {
+  profiles: IcebreakerProfile[];
+};
+
 export const getIcebreakerProfileFromFname = async (
-  fname: string
-): Promise<IcebreakerProfile> => {
-  if (fname) {
-    const response = await fetch(
-      `${ICEBREAKER_API_URL}/api/fname?fname=${fname}`
-    );
+  fname?: string
+): Promise<IcebreakerProfile | undefined> => {
+  if (!fname) {
+    return;
+  }
+  try {
+    const response = await fetch(`${BASE_URL}/api/fname?fname=${fname}`);
     if (!response.ok) {
       throw new Error('Error fetching data for fname');
     }
-    const json = await response.json();
+    const json: ProfileResponse = await response.json();
     return json.profiles[0];
-  } else {
-    throw new Error('No fname or fid for the user provided');
+  } catch (err) {
+    console.error(err);
+    return;
   }
 };

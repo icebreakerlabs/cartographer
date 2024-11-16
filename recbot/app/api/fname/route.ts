@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
       throw new Error('fname is required');
     }
 
-    const response = await fetch(`${ICEBREAKER_API_URL}/api/v1/fname/${fname}`);
+    const response = await fetch(`${ICEBREAKER_API_URL}/v1/fname/${fname}`);
     if (!response.ok) {
       throw new Error('Error fetching data from Icebreaker API');
     }
@@ -17,6 +17,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
   } catch (error) {
     console.error('Error fetching data from Icebreaker API', error);
-    return new NextResponse('Error fetching data from Icebreaker API', { status: 500 });
+    return new NextResponse('Error fetching data from Icebreaker API', {
+      status: 500,
+    });
   }
 }
