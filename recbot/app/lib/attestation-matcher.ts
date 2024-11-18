@@ -97,7 +97,6 @@ function hasCredential(
   if (!credentials || !credentialName) {
     return false;
   }
-
   return credentials.some(({ name }) =>
     exact ? name === credentialName : name.startsWith(credentialName)
   );
@@ -116,15 +115,15 @@ async function canFnameAttestToSchema(
   }
   if (schema.allowRecursion) {
     const icebreakerProfile = await getIcebreakerProfileFromFname(fname);
-    return (
-      !!icebreakerProfile &&
-      hasCredential(schema.name, icebreakerProfile.credentials)
-    );
+    if(icebreakerProfile){
+      const icebreakerProfileHasCredential = hasCredential(schema.name, icebreakerProfile.credentials);
+      return icebreakerProfileHasCredential;
+    } 
   }
   return false;
 }
 
-export const isValidRec = async (text: string, mentioned_profiles: User[]) => {
+export const isValidRec = async (text: string, mentioned_profiles: User[], authorFname: string) => {
   const botUsername = 'rec';
   const match = text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
   const mentionedUsernames = mentioned_profiles
@@ -138,7 +137,7 @@ export const isValidRec = async (text: string, mentioned_profiles: User[]) => {
   );
 
   if (matchedSchema) {
-    const isValid = await canFnameAttestToSchema(fname, matchedSchema);
+    const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
     const returnObj = {
       mentionedUsername: fname,
       schemaName: recContent,

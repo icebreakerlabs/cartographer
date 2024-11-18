@@ -16,7 +16,8 @@ import { attestationsSchemas, isValidRec } from './attestation-matcher';
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const recResp = await isValidRec(
     webhook.data.text,
-    webhook.data.mentioned_profiles
+    webhook.data.mentioned_profiles,
+    webhook.data.author.username
   );
   if (recResp.isValid) {
     const attesterAddress = getEthAddressForUser(webhook.data.author);
@@ -52,6 +53,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
 
       const encodedCredentialName = encodeURIComponent(recResp.schemaName);
 
+      // TODO: parse `response.json` and check the message field instead of just checking for `response.ok`
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
         response.ok
