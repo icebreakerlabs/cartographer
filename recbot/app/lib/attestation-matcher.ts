@@ -1,83 +1,151 @@
-import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
+import { type User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
+import { getIcebreakerProfileFromFname } from './utils';
+import { type AttestationSchema, type IcebreakerCredential } from './types';
 
-export const attestationsAndSkills = [
+export const attestationsSchemas = [
   {
     schemaID: 'recbot:skill:product',
     name: 'Skill: Product',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:design',
     name: 'Skill: Design',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:engineering',
     name: 'Skill: Engineering',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:marketing',
     name: 'Skill: Marketing',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:legal',
     name: 'Skill: Legal',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:finance',
     name: 'Skill: Finance',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:operations',
     name: 'Skill: Operations',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:sales',
     name: 'Skill: Sales',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:support',
     name: 'Skill: Support',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:talent',
     name: 'Skill: Talent',
+    isOpen: true,
+    allowRecursion: false,
   },
   {
     schemaID: 'recbot:skill:data',
     name: 'Skill: Data',
+    isOpen: true,
+    allowRecursion: false,
   },
-  // {
-  //   schemaID: 'recbot:endorsement:qBuilder',
-  //   name: 'qBuilder',
-  // },
+  {
+    schemaID: 'recbot:endorsement:qBuilder',
+    name: 'qBuilder',
+    isOpen: false,
+    allowRecursion: true,
+  },
   {
     schemaID: 'recbot:endorsement:workedDirectlyWith',
     name: 'Worked directly with',
+    isOpen: true,
+    allowRecursion: false,
   },
-];
+  {
+    schemaID: 'recbot:endorsement:human',
+    name: 'Human',
+    isOpen: false,
+    allowRecursion: true,
+  },
+] as AttestationSchema[];
 
-export const isValidSkill = (text: string, mentioned_profiles: User[]) => {
+function hasCredential(
+  credentialName?: string,
+  credentials?: IcebreakerCredential[],
+  exact = false
+) {
+  if (!credentials || !credentialName) {
+    return false;
+  }
+
+  return credentials.some(({ name }) =>
+    exact ? name === credentialName : name.startsWith(credentialName)
+  );
+}
+
+async function canFnameAttestToSchema(
+  fname?: string,
+  schema?: AttestationSchema
+) {
+  if (!fname || !schema) {
+    return false;
+  }
+
+  if (schema.isOpen) {
+    return true;
+  }
+  if (schema.allowRecursion) {
+    const icebreakerProfile = await getIcebreakerProfileFromFname(fname);
+    return (
+      !!icebreakerProfile &&
+      hasCredential(schema.name, icebreakerProfile.credentials)
+    );
+  }
+  return false;
+}
+
+export const isValidRec = async (text: string, mentioned_profiles: User[]) => {
   const botUsername = 'rec';
   const match = text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
     .filter((username) => username !== 'rec');
 
-  const skill = match ? match[1] : '';
-  const username = mentionedUsernames[0];
-  const validSkill = attestationsAndSkills
-    .map((skill) => skill.name)
-    .includes(skill);
-  const validUsername = mentionedUsernames.includes(username);
-  const isValid = match && validSkill && validUsername;
+  const recContent = match ? match[1] : '';
+  const fname = mentionedUsernames[0];
+  const matchedSchema = attestationsSchemas.find(
+    (schema) => schema.name === recContent
+  );
 
-  if (isValid && match) {
+  if (matchedSchema) {
+    const isValid = await canFnameAttestToSchema(fname, matchedSchema);
     const returnObj = {
-      mentionedUsername: mentionedUsernames[0],
-      skill: match[1],
-      isValid: isValid,
+      mentionedUsername: fname,
+      schemaName: recContent,
+      isValid,
     };
     return returnObj;
   } else {
-    return { mentionedUsername: '', skill: '', isValid: false };
+    return { mentionedUsername: fname, schemaName: '', isValid: false };
   }
 };
