@@ -94,6 +94,12 @@ export const attestationsSchemas = [
     allowRecursion: false,
     requiredSchemaName: 'qBuilder',
   },
+  {
+    schemaID: 'recbot:endorsement:bro',
+    name: 'bro',
+    isOpen: false,
+    allowRecursion: true,
+  },
 ] as AttestationSchema[];
 
 function hasCredential(
