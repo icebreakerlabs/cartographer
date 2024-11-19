@@ -19,6 +19,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     webhook.data.mentioned_profiles,
     webhook.data.author.username
   );
+  console.log("Is Valid Response: ", recResp);
   if (recResp.isValid) {
     const attesterAddress = getEthAddressForUser(webhook.data.author);
     const attesteeUser = webhook.data.mentioned_profiles.find(
@@ -50,6 +51,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         },
         body: JSON.stringify(json),
       });
+      const respJson = await response.json();
+      console.log("Icebreaker POST response: ", respJson);
 
       const encodedCredentialName = encodeURIComponent(recResp.schemaName);
 
