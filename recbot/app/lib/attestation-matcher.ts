@@ -87,6 +87,13 @@ export const attestationsSchemas = [
     isOpen: false,
     allowRecursion: true,
   },
+  {
+    schemaID: 'recbot:endorsement:featherIce',
+    name: 'Feather Ice',
+    isOpen: false,
+    allowRecursion: false,
+    requiredSchemaName: 'qBuilder',
+  },
 ] as AttestationSchema[];
 
 function hasCredential(
@@ -110,20 +117,29 @@ async function canFnameAttestToSchema(
     return false;
   }
 
-  if (schema.isOpen) {
+  const { isOpen, allowRecursion, requiredSchemaName, name } = schema;
+
+  if (isOpen) {
     return true;
   }
-  if (schema.allowRecursion) {
+  if (allowRecursion || requiredSchemaName) {
     const icebreakerProfile = await getIcebreakerProfileFromFname(fname);
-    if(icebreakerProfile){
-      const icebreakerProfileHasCredential = hasCredential(schema.name, icebreakerProfile.credentials);
-      return icebreakerProfileHasCredential;
-    } 
+    if (icebreakerProfile) {
+      const icebreakerProfileHasRequiredCredential = hasCredential(
+        requiredSchemaName ?? name,
+        icebreakerProfile.credentials
+      );
+      return icebreakerProfileHasRequiredCredential;
+    }
   }
   return false;
 }
 
-export const isValidRec = async (text: string, mentioned_profiles: User[], authorFname: string) => {
+export const isValidRec = async (
+  text: string,
+  mentioned_profiles: User[],
+  authorFname: string
+) => {
   const botUsername = 'rec';
   const match = text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
   const mentionedUsernames = mentioned_profiles

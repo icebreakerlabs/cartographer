@@ -7,6 +7,7 @@ export type AttestationSchema = {
   name: string;
   isOpen: boolean;
   allowRecursion: boolean;
+  requiredSchemaName?: string;
 };
 
 export type IcebreakerChannel = {
