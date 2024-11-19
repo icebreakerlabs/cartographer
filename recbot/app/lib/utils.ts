@@ -12,12 +12,9 @@ export const neynarClient = new NeynarAPIClient(
   process.env.NEYNAR_API_KEY ?? ''
 );
 
-export const getEthAddressForUser = (user: User) => {
-  if (user.verified_addresses.eth_addresses.length) {
-    return user.verified_addresses.eth_addresses[0];
-  } else {
-    return user.custody_address;
-  }
+export const getEthAddressForUser = async(user: User) => {
+  const icebreakerUser = await getIcebreakerProfileFromFname(user.username);
+  return icebreakerUser?.walletAddress ?? "0x";
 };
 
 type ProfileResponse = {

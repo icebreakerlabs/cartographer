@@ -20,12 +20,15 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     webhook.data.author.username
   );
   if (recResp.isValid) {
-    const attesterAddress = getEthAddressForUser(webhook.data.author);
+    const attesterAddress = await getEthAddressForUser(webhook.data.author);
+    if(attesterAddress === '0x'){
+      throw new Error('Attester address not found');
+    }
     const attesteeUser = webhook.data.mentioned_profiles.find(
       (profile) => profile.username === recResp.mentionedUsername
     );
     const attesteeAddress = attesteeUser
-      ? getEthAddressForUser(attesteeUser)
+      ? await getEthAddressForUser(attesteeUser)
       : '0x';
     const schema = attestationsSchemas.find(
       (schema) => schema.name === recResp.schemaName
