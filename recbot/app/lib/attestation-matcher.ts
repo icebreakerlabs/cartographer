@@ -147,7 +147,7 @@ export const isValidRec = async (
   authorFname: string
 ) => {
   const botUsername = 'rec';
-  const match = text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
+  const match = text.match(new RegExp(`^@${botUsername} \\S+ \\S+ (.+?)(?:\\s+.*)?$`));
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
     .filter((username) => username !== 'rec');
