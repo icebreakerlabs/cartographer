@@ -100,6 +100,12 @@ export const attestationsSchemas = [
     isOpen: false,
     allowRecursion: true,
   },
+  {
+    schemaID: 'recbot:endorsement:chones',
+    name: 'Chones',
+    isOpen: false,
+    allowRecursion: true,
+  },
 ] as AttestationSchema[];
 
 function hasCredential(
