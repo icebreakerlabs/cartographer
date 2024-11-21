@@ -153,22 +153,22 @@ export const isValidRec = async (
   authorFname: string
 ) => {
   const botUsername = 'rec';
-  const match = text.match(new RegExp(`^@${botUsername} \\S+ (.+)$`));
+  const match = text.match(new RegExp(`^@${botUsername} @(\\S+) (.+)$`));
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
     .filter((username) => username !== 'rec');
 
-  const recContent = match ? match[1] : '';
   const fname = mentionedUsernames[0];
+  const recContent = match ? match[2] : '';
   const matchedSchema = attestationsSchemas.find(
-    (schema) => schema.name === recContent
+    (schema) => recContent.includes(schema.name)
   );
 
   if (matchedSchema) {
     const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
     const returnObj = {
       mentionedUsername: fname,
-      schemaName: recContent,
+      schemaName: matchedSchema.name,
       isValid,
     };
     return returnObj;
