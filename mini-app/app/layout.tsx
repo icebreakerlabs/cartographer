@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Recbot',
+  title: 'Feeds Mini App',
   description: '',
 };
 

@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { type User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-
 export type AttestationSchema = {
   schemaID: string;
   name: string;
@@ -16,6 +14,10 @@ export type IcebreakerChannel = {
   isLocked?: boolean;
   value?: string;
   url?: string;
+  metadata?: {
+    name: string;
+    value: string;
+  }[];
 };
 
 export type IcebreakerCredential = {
