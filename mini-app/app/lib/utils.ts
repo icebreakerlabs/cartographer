@@ -3,7 +3,8 @@ import { IcebreakerProfile } from './types';
 export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
 export const NEYNAR_API_URL = 'https://api.neynar.com';
 
-export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+// export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+export const BASE_URL = 'https://cartographer-mini-app.vercel.app';
 
 export const credentials = [
   'Skill: Product',
