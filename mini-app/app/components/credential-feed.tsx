@@ -63,15 +63,17 @@ function convertCastToCastData(cast: FeedResponse['casts'][0]): CastData {
 export default function CredentialFeed() {
     const [query, setQuery] = React.useState<string>('');
     const [searchTriggered, setSearchTriggered] = React.useState<boolean>(false);
+    const [searchTerm, setSearchTerm] = React.useState<string>('');
 
     const { data: credentialFeed, error, isValidating } = useSWR(
-        searchTriggered ? query : null,
+        searchTriggered ? searchTerm : null,
         getCredentialFeed,
         { revalidateOnFocus: false }
     );
 
     const handleSearch = () => {
         setSearchTriggered(true);
+        setSearchTerm(query);
     };
 
     return (
@@ -116,7 +118,7 @@ export default function CredentialFeed() {
                 <div className="pt-3 w-full xl:w-1/3 mx-auto">
                     <div className="flex flex-col gap-2 items-start">
                         {credentialFeed.casts.map((cast: FeedResponse['casts'][0]) => (
-                            <div key={`cast-${cast.hash}`} className="w-auto mx-auto px-2 py-0">
+                            <div key={`cast-${cast.hash}`} className="w-[100%] mx-auto px-2 py-0">
                                 <FarcasterEmbed castData={convertCastToCastData(cast)} />
                             </div>
                         ))}
