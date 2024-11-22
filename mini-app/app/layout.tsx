@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import { BASE_URL } from './lib/utils';
+import { fetchMetadata } from "frames.js/next";
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -14,9 +16,24 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'Feeds Mini App',
-  description: '',
+  title: 'Icebreaker Feed',
+  description: 'Credentialed feeds',
 };
+
+ 
+export async function generateMetadata() {
+  return {
+    title: "Icebreaker Feed",
+    other: {
+      ...(await fetchMetadata(
+        new URL(
+          "/frames",
+          BASE_URL
+        )
+      )),
+    },
+  };
+}
 
 export default function RootLayout({
   children,
