@@ -76,20 +76,27 @@ export default function CredentialFeed() {
 
     return (
         <div>
-            <div className="flex flex-row gap-2 items-center">
+            <div className="flex flex-row gap-2 items-center w-full p-4 bg-gray-100">
                 <input
-                    className="px-2.5 py-1.5 rounded-xl text-black placeholder:text-black"
+                    className="px-4 py-3 w-full rounded-xl text-black placeholder:text-black"
                     type="text"
                     value={query}
                     placeholder="Enter credential"
                     onChange={(e) => setQuery(e.target.value)}
                 />
                 <button
-                    className="px-2.5 py-1.5 rounded-xl bg-blue-500 text-white"
+                    className="px-4 py-3 rounded-xl bg-blue-500 text-white"
                     onClick={handleSearch}
                 >
                     <p>Search</p>
                 </button>
+                {searchTriggered && credentialFeed && credentialFeed.casts.length > 0 && (
+                    <button
+                        className="px-4 py-3 rounded-xl bg-green-500 text-white"
+                    >
+                        <p>Share</p>
+                    </button>
+                )}
             </div>
             {isValidating && (
                 <div className="flex justify-center items-center h-64">
@@ -99,11 +106,17 @@ export default function CredentialFeed() {
                 </div>
             )}
             {error && <div>Error loading data</div>}
-            {credentialFeed && (
-                <div className="pt-3">
+            {!isValidating && !credentialFeed && (
+                <div className="flex flex-row gap-2 justify-center items-center h-64 text-gray-500">
+                    <div className="text-3xl">🔍</div>
+                    <p className="text-lg font-medium">Enter a credential above to see casts from all of its holders!</p>
+                </div>
+            )}
+            {credentialFeed && credentialFeed.casts.length > 0 && (
+                <div className="pt-3 w-full xl:w-1/3 mx-auto">
                     <div className="flex flex-col gap-2 items-start">
                         {credentialFeed.casts.map((cast: FeedResponse['casts'][0]) => (
-                            <div key={`cast-${cast.hash}`} className="w-full md:w-[65%]">
+                            <div key={`cast-${cast.hash}`} className="w-auto mx-auto px-2 py-0">
                                 <FarcasterEmbed castData={convertCastToCastData(cast)} />
                             </div>
                         ))}
