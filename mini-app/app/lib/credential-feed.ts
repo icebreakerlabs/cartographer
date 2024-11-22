@@ -1,5 +1,4 @@
-import { FeedResponse } from "@neynar/nodejs-sdk/build/neynar-api/v2";
-import { IcebreakerProfile } from "./types";
+import { FeedResponse, IcebreakerProfile } from "./types";
 import { BASE_URL, getIcebreakerProfileFromEthAddress, getIcebreakerProfileFromFname } from "./utils";
 
 type ProfileResponse = {
@@ -68,26 +67,23 @@ export const getCredentialFeed = async(credentialName: string) => {
 }
 
 export const getFidsFromCredentialName = async(name: string): Promise<number[] | undefined> => {
-    if (!name) {
-        return;
-      }
-      try {
-       const profiles = await getProfilesHoldingCredential(name);
-        if (!profiles || profiles.length === 0) {
+  if (!name) {
+      return;
+  }
+  try {
+      const profiles = await getProfilesHoldingCredential(name);
+      if (!profiles || profiles.length === 0) {
           throw new Error('No profiles or credentials found');
-        }
-        const hydratedProfiles = await Promise.all(profiles.map(async(profile) => {
-            const finalProfile = await getHydratedProfileFromEthAddress(profile.walletAddress);
-            return finalProfile;
-        }));
-        return hydratedProfiles.map((profile) => {
-          const fcChannel = profile?.channels?.find((channel) => channel.type === 'farcaster');
-          if(fcChannel && fcChannel.metadata){
-            return parseInt(fcChannel.metadata[0].value);
-          }
-        }).filter((fid): fid is number => fid !== undefined);
-      } catch (err) {
-        console.error(err);
-        return;
       }
+      const hydratedProfiles = await Promise.all(profiles.map(profile => 
+          getHydratedProfileFromEthAddress(profile.primaryWalletAddress ?? '')
+      ));
+      return hydratedProfiles.flatMap(profile => {
+          const fcChannel = profile?.channels?.find(channel => channel.type === 'farcaster');
+          return fcChannel?.metadata ? [parseInt(fcChannel.metadata[0].value)] : [];
+      }).filter((fid): fid is number => fid !== undefined);
+  } catch (err) {
+      console.error(err);
+      return;
+  }
 }

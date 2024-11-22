@@ -1,15 +1,12 @@
-import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { IcebreakerProfile } from './types';
 
 export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
+export const NEYNAR_API_URL = 'https://api.neynar.com';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 export const ICEBREAKER_CREDENTIALS_URL =
   'https://app.icebreaker.xyz/credentials';
-export const neynarClient = new NeynarAPIClient(
-  process.env.NEYNAR_API_KEY ?? ''
-);
 
 type ProfileResponse = {
   profiles: IcebreakerProfile[];
