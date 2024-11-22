@@ -7,7 +7,7 @@ const handleRequest = frames(async() => {
   return {
     image: 'https://i.imgur.com/jS6MHOW.png',
     buttons: [
-      <Button action="link" target={new URL("/api/composer-action", BASE_URL)}>
+      <Button action="link" target={`https://warpcast.com/~/composer-action?url=${BASE_URL}/api/composer-action`}>
         Load Mini App
       </Button>,
     ],

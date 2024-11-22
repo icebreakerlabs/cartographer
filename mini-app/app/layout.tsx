@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
 import { BASE_URL } from './lib/utils';
@@ -15,15 +14,11 @@ const geistMono = localFont({
   weight: '100 900',
 });
 
-export const metadata: Metadata = {
-  title: 'Icebreaker Feed',
-  description: 'Credentialed feeds',
-};
-
  
 export async function generateMetadata() {
   return {
     title: "Icebreaker Feed",
+    description: 'Credentialed feeds',
     other: {
       ...(await fetchMetadata(
         new URL(
