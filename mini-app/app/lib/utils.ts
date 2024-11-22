@@ -7,6 +7,10 @@ export const NEYNAR_API_URL = 'https://api.neynar.com';
 export const BASE_URL = 'https://cartographer-mini-app.vercel.app';
 
 export const credentials = [
+  'qBuilder',
+  'Human',
+  'bro',
+  'Chones',
   'Skill: Product',
   'Skill: Design',
   'Skill: Engineering',
@@ -18,12 +22,6 @@ export const credentials = [
   'Skill: Support',
   'Skill: Talent',
   'Skill: Data',
-  'qBuilder',
-  'Worked directly with',
-  'Human',
-  'Feather Ice',
-  'bro',
-  'Chones',
 ];
 
 export const ICEBREAKER_CREDENTIALS_URL =
