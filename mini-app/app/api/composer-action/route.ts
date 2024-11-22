@@ -16,8 +16,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { state } = await req.json();
-  console.log(state);
   return NextResponse.json({
     "type": "form",
     "title": "Icebreaker Feed",

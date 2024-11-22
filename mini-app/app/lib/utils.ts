@@ -5,6 +5,26 @@ export const NEYNAR_API_URL = 'https://api.neynar.com';
 
 export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
+export const credentials = [
+  'Skill: Product',
+  'Skill: Design',
+  'Skill: Engineering',
+  'Skill: Marketing',
+  'Skill: Legal',
+  'Skill: Finance',
+  'Skill: Operations',
+  'Skill: Sales',
+  'Skill: Support',
+  'Skill: Talent',
+  'Skill: Data',
+  'qBuilder',
+  'Worked directly with',
+  'Human',
+  'Feather Ice',
+  'bro',
+  'Chones',
+];
+
 export const ICEBREAKER_CREDENTIALS_URL =
   'https://app.icebreaker.xyz/credentials';
 
