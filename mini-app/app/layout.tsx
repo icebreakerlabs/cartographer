@@ -1,7 +1,6 @@
 import localFont from 'next/font/local';
 import './globals.css';
-import { BASE_URL } from './lib/utils';
-import { fetchMetadata } from "frames.js/next";
+import { frame } from './lib/utils';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -14,20 +13,14 @@ const geistMono = localFont({
   weight: '100 900',
 });
 
- 
 export async function generateMetadata() {
   return {
-    title: "Icebreaker Feed",
+    title: "Icebreaker Feeds",
     description: 'Credentialed feeds',
     other: {
-      ...(await fetchMetadata(
-        new URL(
-          "/frames",
-          BASE_URL
-        )
-      )),
-    },
-  };
+      "fc:frame": JSON.stringify(frame),
+    }
+  }
 }
 
 export default function RootLayout({

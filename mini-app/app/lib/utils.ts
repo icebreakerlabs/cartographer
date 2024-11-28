@@ -5,6 +5,8 @@ export const NEYNAR_API_URL = 'https://api.neynar.com';
 
 // export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 export const BASE_URL = 'https://cartographer-mini-app.vercel.app';
+export const BANNER_URL = 'https://i.imgur.com/q2oX7zl.png';
+export const ICON_URL = 'https://i.imgur.com/JZMb574.jpg';
 
 export const credentials = [
   'qBuilder',
@@ -23,6 +25,21 @@ export const credentials = [
   'Skill: Talent',
   'Skill: Data',
 ];
+
+export const frame = {
+  version: "next",
+  imageUrl: BANNER_URL,
+  button: {
+    title: "Launch Feeds",
+    action: {
+      type: "launch_frame",
+      name: "Icebreaker Feeds",
+      url: BASE_URL,
+      splashImageUrl: ICON_URL,
+      splashBackgroundColor: "#000000",
+    },
+  },
+};
 
 export const ICEBREAKER_CREDENTIALS_URL =
   'https://app.icebreaker.xyz/credentials';
