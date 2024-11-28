@@ -7,9 +7,9 @@ import { CastData, FeedResponse } from "../lib/types";
 import { FarcasterEmbed } from "react-farcaster-embed/dist/client";
 import { credentials } from '../lib/utils';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 import "react-farcaster-embed/dist/styles.css";
-import { ArrowDown } from "lucide-react";
 
 function convertCastToCastData(cast: FeedResponse['casts'][0]): CastData {
     return {
@@ -78,7 +78,7 @@ export default function CredentialFeed() {
                     <DropdownMenu>
                         <DropdownMenuTrigger className="px-4 py-3 mx-3 xl:mx-0 text-white dark:text-black rounded-xl bg-gray-700 dark:bg-white text-left flex flex-row gap-1 items-center" disabled={isValidating || error}>
                             Feed for {selectedCredential}
-                            <ArrowDown className="size-5 pl-1" />
+                            <ChevronDown className="size-5 pl-1" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             {credentials.map((credential) => (
