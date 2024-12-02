@@ -160,9 +160,9 @@ export const isValidRec = async (
 
   const fname = mentionedUsernames[0];
   const recContent = match ? match[2] : '';
-  const matchedSchema = attestationsSchemas.find(
-    (schema) => recContent.includes(schema.name)
-  );
+  const matchedSchema = recContent.toLowerCase().startsWith('bot')
+    ? attestationsSchemas.find((schema) => schema.name === 'Feather Ice')
+    : attestationsSchemas.find((schema) => recContent.includes(schema.name));
 
   if (matchedSchema) {
     const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
