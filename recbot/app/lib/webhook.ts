@@ -21,7 +21,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
   );
   if (recResp.isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
-    if(attesterAddress === '0x'){
+    if (attesterAddress === '0x') {
       throw new Error('Attester address not found');
     }
     const attesteeUser = webhook.data.mentioned_profiles.find(
@@ -60,7 +60,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
         response.ok
-          ? `Success! Visit ${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=givers&receivers=${attesteeAddress} to view on Icebreaker.`
+          ? `Success! Visit ${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=receivers to view on Icebreaker.`
           : 'Beep boop. Something went wrong.',
         {
           replyTo: webhook.data.hash,
