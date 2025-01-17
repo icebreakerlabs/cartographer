@@ -150,16 +150,29 @@ async function canFnameAttestToSchema(
 export const isValidRec = async (
   text: string,
   mentioned_profiles: User[],
-  authorFname: string
+  authorFname: string,
+  parentFname?: string
 ) => {
   const botUsername = 'rec';
-  const match = text.match(new RegExp(`^@${botUsername} @(\\S+) (.+)$`, 'im'));
+  const match = text.match(
+    new RegExp(`^@${botUsername}(?:\\s+@(\\S+))?\\s+(.+)$`, 'im')
+  );
+
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
     .filter((username) => username !== 'rec');
 
-  const fname = mentionedUsernames[0];
-  const recContent = match ? match[2] : '';
+  const attesteeFname = mentionedUsernames[0] ?? parentFname ?? undefined;
+
+  if (!match || !attesteeFname) {
+    return { mentionedUsername: '', schemaName: '', isValid: false };
+  }
+
+  const recContent = match
+    ? mentionedUsernames.length
+      ? match[2]
+      : match[1]
+    : '';
   const matchedSchema = recContent.toLowerCase().startsWith('bot')
     ? attestationsSchemas.find((schema) => schema.name === 'Feather Ice')
     : attestationsSchemas.find((schema) => recContent.includes(schema.name));
@@ -167,12 +180,12 @@ export const isValidRec = async (
   if (matchedSchema) {
     const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
     const returnObj = {
-      mentionedUsername: fname,
+      mentionedUsername: attesteeFname,
       schemaName: matchedSchema.name,
       isValid,
     };
     return returnObj;
   } else {
-    return { mentionedUsername: fname, schemaName: '', isValid: false };
+    return { mentionedUsername: attesteeFname, schemaName: '', isValid: false };
   }
 };
