@@ -14,10 +14,17 @@ import {
 import { attestationsSchemas, isValidRec } from './attestation-matcher';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
+  const parentAuthorFid = webhook.data.parent_author?.fid;
+
+  const parentAuthorFname = parentAuthorFid
+    ? (await neynarClient.fetchBulkUsers([parentAuthorFid])).users[0]?.username
+    : undefined;
+
   const recResp = await isValidRec(
     webhook.data.text,
     webhook.data.mentioned_profiles,
-    webhook.data.author.username
+    webhook.data.author.username,
+    parentAuthorFname
   );
   if (recResp.isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
@@ -25,7 +32,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       throw new Error('Attester address not found');
     }
     const attesteeUser = webhook.data.mentioned_profiles.find(
-      (profile) => profile.username === recResp.mentionedUsername
+      (profile) => profile.username === recResp.attesteeFname
     );
     const attesteeAddress = attesteeUser
       ? await getEthAddressForUser(attesteeUser)
