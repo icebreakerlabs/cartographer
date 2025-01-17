@@ -32,7 +32,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       throw new Error('Attester address not found');
     }
     const attesteeUser = webhook.data.mentioned_profiles.find(
-      (profile) => profile.username === recResp.mentionedUsername
+      (profile) => profile.username === recResp.attesteeFname
     );
     const attesteeAddress = attesteeUser
       ? await getEthAddressForUser(attesteeUser)

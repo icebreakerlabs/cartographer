@@ -147,16 +147,20 @@ async function canFnameAttestToSchema(
   return false;
 }
 
+type ValidCastRecResponse = {
+  attesteeFname: string;
+  schemaName: string;
+  isValid: boolean;
+};
+
 export const isValidRec = async (
   text: string,
   mentioned_profiles: User[],
   authorFname: string,
   parentFname?: string
-) => {
+): Promise<ValidCastRecResponse> => {
   const botUsername = 'rec';
-  const match = text.match(
-    new RegExp(`^@${botUsername}(?:\\s+@(\\S+))?\\s+(.+)$`, 'im')
-  );
+  const match = text.match(new RegExp(`^@${botUsername} @(\\S+) (.+)$`, 'im'));
 
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
@@ -165,7 +169,7 @@ export const isValidRec = async (
   const attesteeFname = mentionedUsernames[0] ?? parentFname ?? undefined;
 
   if (!match || !attesteeFname) {
-    return { mentionedUsername: '', schemaName: '', isValid: false };
+    return { attesteeFname, schemaName: '', isValid: false };
   }
 
   const recContent = match
@@ -180,12 +184,12 @@ export const isValidRec = async (
   if (matchedSchema) {
     const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
     const returnObj = {
-      mentionedUsername: attesteeFname,
+      attesteeFname,
       schemaName: matchedSchema.name,
       isValid,
     };
     return returnObj;
   } else {
-    return { mentionedUsername: attesteeFname, schemaName: '', isValid: false };
+    return { attesteeFname, schemaName: '', isValid: false };
   }
 };
