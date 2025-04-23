@@ -137,28 +137,27 @@ async function canFnameAttestToSchema(
   if (allowRecursion || requiredSchemaName) {
     const icebreakerProfile = await getIcebreakerProfileFromFname(fname);
     if (icebreakerProfile) {
-      const icebreakerProfileHasRequiredCredential = hasCredential(
+      return hasCredential(
         requiredSchemaName ?? name,
         icebreakerProfile.credentials
       );
-      return icebreakerProfileHasRequiredCredential;
     }
   }
   return false;
 }
 
-type ValidCastRecResponse = {
+type RecommendationDataResponse = {
   attesteeFname: string;
   schemaName: string;
   isValid: boolean;
 };
 
-export const isValidRec = async (
+export const getRecommendationData = async (
   text: string,
   mentioned_profiles: User[],
   authorFname: string,
   parentFname?: string
-): Promise<ValidCastRecResponse> => {
+): Promise<RecommendationDataResponse> => {
   const botUsername = 'rec';
   const match = text.match(new RegExp(`^@${botUsername} @(\\S+) (.+)$`, 'im'));
 
@@ -166,10 +165,10 @@ export const isValidRec = async (
     .map((profile) => profile.username)
     .filter((username) => username !== 'rec');
 
-  const attesteeFname = mentionedUsernames[0] ?? parentFname ?? undefined;
+  const attesteeFname = mentionedUsernames[0] || parentFname;
 
-  if (!match || !attesteeFname) {
-    return { attesteeFname, schemaName: '', isValid: false };
+  if (!match?.length || !attesteeFname) {
+    return { attesteeFname: '', schemaName: '', isValid: false };
   }
 
   const recContent = match
@@ -183,13 +182,11 @@ export const isValidRec = async (
 
   if (matchedSchema) {
     const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
-    const returnObj = {
+    return {
       attesteeFname,
       schemaName: matchedSchema.name,
       isValid,
     };
-    return returnObj;
-  } else {
-    return { attesteeFname, schemaName: '', isValid: false };
   }
+  return { attesteeFname, schemaName: '', isValid: false };
 };
