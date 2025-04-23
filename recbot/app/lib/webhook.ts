@@ -23,12 +23,15 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     ? (await neynarClient.fetchBulkUsers([parentAuthorFid])).users[0]?.username
     : undefined;
 
+  console.log(parentAuthorFname);
+
   const { isValid, attesteeFname, schemaName } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
     parentAuthorFname
   );
+  console.log(isValid, attesteeFname, schemaName);
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
     if (attesterAddress === '0x') {
