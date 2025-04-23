@@ -85,7 +85,7 @@ export type IcebreakerStoreCredentialsParams = {
   value?: string;
   source?: string;
   reference?: string;
-  chain?: ChainSlug;
+  chain?: string;
   timestamp?: number | string;
   uid?: string;
   isPublic?: boolean;

@@ -11,40 +11,42 @@ import {
   ICEBREAKER_CREDENTIALS_URL,
   neynarClient,
 } from './utils';
-import { attestationsSchemas, isValidRec } from './attestation-matcher';
+import {
+  attestationsSchemas,
+  getRecommendationData,
+} from './attestation-matcher';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
-
   const parentAuthorFname = parentAuthorFid
     ? (await neynarClient.fetchBulkUsers([parentAuthorFid])).users[0]?.username
     : undefined;
 
-  const recResp = await isValidRec(
+  const { isValid, attesteeFname, schemaName } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
     parentAuthorFname
   );
-  if (recResp.isValid) {
+  if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
     if (attesterAddress === '0x') {
       throw new Error('Attester address not found');
     }
     const attesteeUser = webhook.data.mentioned_profiles.find(
-      (profile) => profile.username === recResp.attesteeFname
+      (profile) => profile.username === attesteeFname
     );
     const attesteeAddress = attesteeUser
       ? await getEthAddressForUser(attesteeUser)
       : '0x';
     const schema = attestationsSchemas.find(
-      (schema) => schema.name === recResp.schemaName
+      (schema) => schema.name === schemaName
     );
     const json: IcebreakerStoreCredentialsParams = {
       attesterAddress: attesterAddress,
       attesteeAddress: attesteeAddress,
       isPublic: true,
-      name: recResp.schemaName,
+      name: schemaName,
       schemaID: schema?.schemaID ?? '-1',
       source: 'Farcaster',
       reference: webhook.data.hash,
@@ -61,7 +63,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         body: JSON.stringify(json),
       });
 
-      const encodedCredentialName = encodeURIComponent(recResp.schemaName);
+      const encodedCredentialName = encodeURIComponent(schemaName);
 
       // TODO: parse `response.json` and check the message field instead of just checking for `response.ok`
       await neynarClient.publishCast(
@@ -80,8 +82,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     try {
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
-        recResp.schemaName
-          ? `You must receive an endorsement for ${recResp.schemaName} before you can endorse others.`
+        schemaName
+          ? `You must receive an endorsement for ${schemaName} before you can endorse others.`
           : 'Unable to endorse. Make sure to format with: (at)rec (at)<username> <endorsement>',
         {
           replyTo: webhook.data.hash,
