@@ -17,7 +17,7 @@ import {
 } from './attestation-matcher';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
-  console.log(webhook);
+  console.log(JSON.stringify(webhook, null, 2));
   const parentAuthorFid = webhook.data.parent_author?.fid;
   const parentAuthorFname = parentAuthorFid
     ? (await neynarClient.fetchBulkUsers([parentAuthorFid])).users[0]?.username
