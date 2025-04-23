@@ -159,7 +159,9 @@ export const getRecommendationData = async (
   parentFname?: string
 ): Promise<RecommendationDataResponse> => {
   const botUsername = 'rec';
-  const match = text.match(new RegExp(`^@${botUsername} @(\\S+) (.+)$`, 'im'));
+  const match = text.match(new RegExp(`^@${botUsername} @?(\\S+) (.+)$`, 'im'));
+
+  console.log(match);
 
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
