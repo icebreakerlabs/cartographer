@@ -159,28 +159,39 @@ export const getRecommendationData = async (
   parentFname?: string
 ): Promise<RecommendationDataResponse> => {
   const botUsername = 'rec';
-  const match = text.match(new RegExp(`^@${botUsername} @?(\\S+) (.+)$`, 'im'));
-
-  console.log(match);
-
+  const startsWithBot = text.startsWith(`@${botUsername}`);
+  if (!startsWithBot) {
+    return { attesteeFname: '', schemaName: '', isValid: false };
+  }
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
-    .filter((username) => username !== 'rec');
+    .filter((username) => username !== botUsername);
 
   const attesteeFname = mentionedUsernames[0] || parentFname;
 
-  if (!match?.length || !attesteeFname) {
+  if (!attesteeFname) {
     return { attesteeFname: '', schemaName: '', isValid: false };
   }
 
-  const recContent = match
-    ? mentionedUsernames.length
-      ? match[2]
-      : match[1]
-    : '';
-  const matchedSchema = recContent.toLowerCase().startsWith('bot')
+  const escapeRegex = (str: string) =>
+    str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  const usernamesToRemove = [...mentionedUsernames, botUsername].map(
+    (username) => `@${escapeRegex(username)}`
+  );
+  // Create regex to filter out usernames
+  const usernamesRegex = new RegExp(usernamesToRemove.join('|'), 'gi');
+  const cleanText = text
+    .replace(usernamesRegex, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleanText) {
+    return { attesteeFname, schemaName: '', isValid: false };
+  }
+  const matchedSchema = cleanText.toLowerCase().startsWith('bot')
     ? attestationsSchemas.find((schema) => schema.name === 'Feather Ice')
-    : attestationsSchemas.find((schema) => recContent.includes(schema.name));
+    : attestationsSchemas.find((schema) => cleanText.includes(schema.name));
 
   if (matchedSchema) {
     const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
