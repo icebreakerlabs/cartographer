@@ -6,6 +6,7 @@ import {
   type WebhookData,
 } from './types';
 import {
+  getEthAddressForFname,
   getEthAddressForUser,
   ICEBREAKER_API_URL,
   ICEBREAKER_CREDENTIALS_URL,
@@ -37,12 +38,9 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     if (attesterAddress === '0x') {
       throw new Error('Attester address not found');
     }
-    const attesteeUser = webhook.data.mentioned_profiles.find(
-      (profile) => profile.username === attesteeFname
-    );
-    const attesteeAddress = attesteeUser
-      ? await getEthAddressForUser(attesteeUser)
-      : '0x';
+
+    const attesteeAddress = await getEthAddressForFname(attesteeFname);
+
     const schema = attestationsSchemas.find(
       (schema) => schema.name === schemaName
     );
