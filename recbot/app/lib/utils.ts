@@ -12,9 +12,9 @@ export const neynarClient = new NeynarAPIClient(
   process.env.NEYNAR_API_KEY ?? ''
 );
 
-export const getEthAddressForUser = async(user: User) => {
+export const getEthAddressForUser = async (user: User) => {
   const icebreakerUser = await getIcebreakerProfileFromFname(user.username);
-  return icebreakerUser?.walletAddress ?? "0x";
+  return icebreakerUser?.walletAddress ?? '0x';
 };
 
 type ProfileResponse = {
@@ -28,7 +28,7 @@ export const getIcebreakerProfileFromFname = async (
     return;
   }
   try {
-    const response = await fetch(`${BASE_URL}/api/fname?fname=${fname}`);
+    const response = await fetch(`${BASE_URL}/api/v1/fname/${fname}`);
     if (!response.ok) {
       throw new Error('Error fetching data for fname');
     }
