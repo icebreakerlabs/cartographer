@@ -18,13 +18,10 @@ import {
 } from './attestation-matcher';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
-  console.log(JSON.stringify(webhook, null, 2));
   const parentAuthorFid = webhook.data.parent_author?.fid;
   const parentAuthorFname = parentAuthorFid
     ? (await neynarClient.fetchBulkUsers([parentAuthorFid])).users[0]?.username
     : undefined;
-
-  console.log(parentAuthorFname);
 
   const { isValid, attesteeFname, schemaName } = await getRecommendationData(
     webhook.data.text,
@@ -32,7 +29,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     webhook.data.author.username,
     parentAuthorFname
   );
-  console.log(isValid, attesteeFname, schemaName);
+
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
     if (attesterAddress === '0x') {
@@ -56,7 +53,6 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       uid: `${webhook.data.hash}000000000000000000000000`,
     };
 
-    console.log(json, schema, attesterAddress, attesteeAddress);
     try {
       const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
         method: 'PUT',
@@ -67,10 +63,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         body: JSON.stringify(json),
       });
 
-      console.log(response);
-
       const encodedCredentialName = encodeURIComponent(schemaName);
-      console.log(encodedCredentialName);
 
       // TODO: parse `response.json` and check the message field instead of just checking for `response.ok`
       await neynarClient.publishCast(
