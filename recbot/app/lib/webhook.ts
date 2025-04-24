@@ -12,10 +12,8 @@ import {
   ICEBREAKER_CREDENTIALS_URL,
   neynarClient,
 } from './utils';
-import {
-  attestationsSchemas,
-  getRecommendationData,
-} from './attestation-matcher';
+import { getRecommendationData } from './getRecommendationData';
+import { attestationSchemas } from './attestationSchemas';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
@@ -38,7 +36,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
 
     const attesteeAddress = await getEthAddressForFname(attesteeFname);
 
-    const schema = attestationsSchemas.find(
+    const schema = attestationSchemas.find(
       (schema) => schema.name === schemaName
     );
     const json: IcebreakerStoreCredentialsParams = {
@@ -46,7 +44,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       attesteeAddress: attesteeAddress,
       isPublic: true,
       name: schemaName,
-      schemaID: schema?.schemaID ?? '-1',
+      schemaID: schema?.id ?? '-1',
       source: 'Farcaster',
       reference: webhook.data.hash,
       timestamp: webhook.data.timestamp,
