@@ -12,7 +12,10 @@ export const neynarClient = new NeynarAPIClient(
 
 export const getEthAddressForUser = async (user: User) => {
   const icebreakerUser = await getIcebreakerProfileFromFname(user.username);
-  return icebreakerUser?.walletAddress ?? '0x';
+  return (
+    icebreakerUser?.walletAddress ??
+    '0x3b856054a8bc661ebade87f891f697e7d0801cb9'
+  );
 };
 
 type ProfileResponse = {
