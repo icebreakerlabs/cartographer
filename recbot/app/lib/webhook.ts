@@ -57,6 +57,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       timestamp: webhook.data.timestamp,
       uid: `${webhook.data.hash}000000000000000000000000`,
     };
+
+    console.log(json, schema, attesterAddress, attesteeAddress);
     try {
       const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
         method: 'PUT',
@@ -67,7 +69,10 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         body: JSON.stringify(json),
       });
 
+      console.log(response);
+
       const encodedCredentialName = encodeURIComponent(schemaName);
+      console.log(encodedCredentialName);
 
       // TODO: parse `response.json` and check the message field instead of just checking for `response.ok`
       await neynarClient.publishCast(
