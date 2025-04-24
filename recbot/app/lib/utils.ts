@@ -4,8 +4,6 @@ import { IcebreakerProfile } from './types';
 
 export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-
 export const ICEBREAKER_CREDENTIALS_URL =
   'https://app.icebreaker.xyz/credentials';
 export const neynarClient = new NeynarAPIClient(
@@ -28,7 +26,7 @@ export const getIcebreakerProfileFromFname = async (
     return;
   }
   try {
-    const response = await fetch(`${BASE_URL}/api/v1/fname/${fname}`);
+    const response = await fetch(`${ICEBREAKER_API_URL}/v1/fname/${fname}`);
     if (!response.ok) {
       throw new Error('Error fetching data for fname');
     }
