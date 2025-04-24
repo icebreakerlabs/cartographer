@@ -1,6 +1,10 @@
 import { NeynarAPIClient } from '@neynar/nodejs-sdk';
 import { User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
-import { IcebreakerProfile } from './types';
+import {
+  type IcebreakerCredential,
+  type AttestationSchema,
+  type IcebreakerProfile,
+} from './types';
 
 export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
 
@@ -45,3 +49,41 @@ export const getIcebreakerProfileFromFname = async (
     return;
   }
 };
+
+export function hasCredential(
+  credentialName?: string,
+  credentials?: IcebreakerCredential[],
+  exact = false
+) {
+  if (!credentials || !credentialName) {
+    return false;
+  }
+  return credentials.some(({ name }) =>
+    exact ? name === credentialName : name.startsWith(credentialName)
+  );
+}
+
+export async function canFnameAttestToSchema(
+  fname?: string,
+  schema?: AttestationSchema
+) {
+  if (!fname || !schema) {
+    return false;
+  }
+
+  const { isOpen, allowRecursion, requiredSchemaName, name } = schema;
+
+  if (isOpen) {
+    return true;
+  }
+  if (allowRecursion || requiredSchemaName) {
+    const icebreakerProfile = await getIcebreakerProfileFromFname(fname);
+    if (icebreakerProfile) {
+      return hasCredential(
+        requiredSchemaName ?? name,
+        icebreakerProfile.credentials
+      );
+    }
+  }
+  return false;
+}

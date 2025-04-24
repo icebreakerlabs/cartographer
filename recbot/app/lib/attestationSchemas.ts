@@ -1,0 +1,115 @@
+import { type AttestationSchema } from './types';
+
+export const attestationSchemas = [
+  {
+    id: 'recbot:skill:product',
+    name: 'Skill: Product',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:design',
+    name: 'Skill: Design',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:engineering',
+    name: 'Skill: Engineering',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:marketing',
+    name: 'Skill: Marketing',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:legal',
+    name: 'Skill: Legal',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:finance',
+    name: 'Skill: Finance',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:operations',
+    name: 'Skill: Operations',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:sales',
+    name: 'Skill: Sales',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:support',
+    name: 'Skill: Support',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:talent',
+    name: 'Skill: Talent',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:skill:data',
+    name: 'Skill: Data',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:endorsement:qBuilder',
+    name: 'qBuilder',
+    isOpen: false,
+    allowRecursion: true,
+  },
+  {
+    id: 'recbot:endorsement:workedDirectlyWith',
+    name: 'Worked directly with',
+    isOpen: true,
+    allowRecursion: false,
+  },
+  {
+    id: 'recbot:endorsement:human',
+    name: 'Human',
+    isOpen: false,
+    allowRecursion: true,
+  },
+  {
+    id: 'recbot:endorsement:featherIce',
+    name: 'Feather Ice',
+    isOpen: false,
+    allowRecursion: false,
+    requiredSchemaName: 'qBuilder',
+  },
+  {
+    id: 'recbot:endorsement:bro',
+    name: 'bro',
+    isOpen: false,
+    allowRecursion: true,
+  },
+  {
+    id: 'recbot:endorsement:chones',
+    name: 'Chones',
+    isOpen: false,
+    allowRecursion: true,
+  },
+  {
+    id: 'recbot:endorsement:iceCream',
+    name: 'Ice cream',
+    source: 'Farcaster',
+    description: 'Ice cream endorsements from recbot via Farcaster',
+    isOpen: true,
+    allowRecursion: false,
+  },
+] as AttestationSchema[];
