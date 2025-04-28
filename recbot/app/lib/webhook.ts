@@ -62,15 +62,17 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       });
 
       const encodedCredentialName = encodeURIComponent(schemaName);
+      const credentialUrl = `${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=receivers`;
 
       // TODO: parse `response.json` and check the message field instead of just checking for `response.ok`
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
         response.ok
-          ? `Success! Visit ${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=receivers to view on Icebreaker.`
+          ? `Success! Visit ${credentialUrl} to view on Icebreaker.`
           : 'Beep boop. Something went wrong.',
         {
           replyTo: webhook.data.hash,
+          embeds: response.ok ? [{ url: credentialUrl }] : undefined,
         }
       );
     } catch (err) {
