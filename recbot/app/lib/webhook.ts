@@ -9,11 +9,11 @@ import {
   getEthAddressForFname,
   getEthAddressForUser,
   ICEBREAKER_API_URL,
-  ICEBREAKER_CREDENTIALS_URL,
   neynarClient,
 } from './utils';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
+import { getReplyCastData } from './getReplyCastData';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
@@ -61,18 +61,14 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         body: JSON.stringify(json),
       });
 
-      const encodedCredentialName = encodeURIComponent(schemaName);
-      const credentialUrl = `${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=receivers`;
+      const castData = getReplyCastData(isValid, schemaName, response.ok);
 
-      // TODO: parse `response.json` and check the message field instead of just checking for `response.ok`
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
-        response.ok
-          ? `Success! Visit ${credentialUrl} to view on Icebreaker.`
-          : 'Beep boop. Something went wrong.',
+        castData.text,
         {
           replyTo: webhook.data.hash,
-          embeds: response.ok ? [{ url: credentialUrl }] : undefined,
+          embeds: castData.embeds,
         }
       );
     } catch (err) {
@@ -82,9 +78,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     try {
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
-        schemaName
-          ? `You must receive an endorsement for ${schemaName} before you can endorse others.`
-          : 'Unable to endorse. Make sure to format with: (at)rec (at)<username> <endorsement>',
+        getReplyCastData(isValid, schemaName).text,
         {
           replyTo: webhook.data.hash,
         }

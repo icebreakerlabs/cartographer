@@ -105,7 +105,7 @@ export const attestationSchemas = [
     allowRecursion: true,
   },
   {
-    id: 'recbot:endorsement:iceCream',
+    id: 'recbot:endorsement:icecream',
     name: 'Ice cream',
     source: 'Farcaster',
     description: 'Ice cream endorsements from recbot via Farcaster',
