@@ -17,10 +17,18 @@ export function getReplyCastData(
   const url = `${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=receivers`;
 
   if (isSuccess) {
-    return {
-      text: `Success! Visit ${url} to view on Icebreaker.`,
-      embeds: [{ url }],
-    };
+    switch (schemaName) {
+      case 'Ice cream':
+        return {
+          text: `🍦 success! Visit https://icebreaker.xyz/farcon2025 to view on Icebreaker.`,
+          embeds: [{ url: 'https://icebreaker.xyz/farcon2025' }],
+        };
+      default:
+        return {
+          text: `Success! Visit ${url} to view on Icebreaker.`,
+          embeds: [{ url }],
+        };
+    }
   } else {
     return {
       text: 'Beep boop. Something went wrong.',
