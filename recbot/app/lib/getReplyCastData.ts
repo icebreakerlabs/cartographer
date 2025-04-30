@@ -3,12 +3,15 @@ import { ICEBREAKER_CREDENTIALS_URL } from './utils';
 export function getReplyCastData(
   isValidRecommendation: boolean,
   schemaName?: string,
+  requiredSchemaName?: string,
   isSuccess?: boolean
 ): { text: string; embeds?: { url: string }[] } {
   if (!isValidRecommendation || !schemaName) {
     return {
       text: schemaName
-        ? `You must receive an endorsement for ${schemaName} before you can endorse others.`
+        ? `Oops! You must receive an endorsement for ${
+            requiredSchemaName ?? schemaName
+          } before you can endorse others.`
         : 'Unable to endorse. Make sure to format with: (at)rec (at)<username> <endorsement>',
     };
   }
@@ -21,7 +24,6 @@ export function getReplyCastData(
       case 'Ice cream':
         return {
           text: `🍦 success! Visit https://icebreaker.xyz/farcon2025 to view on Icebreaker.`,
-          embeds: [{ url: 'https://icebreaker.xyz/farcon2025' }],
         };
       default:
         return {

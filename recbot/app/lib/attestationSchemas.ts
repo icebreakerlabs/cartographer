@@ -109,7 +109,8 @@ export const attestationSchemas = [
     name: 'Ice cream',
     source: 'Farcaster',
     description: 'Ice cream endorsements from recbot via Farcaster',
-    isOpen: true,
+    isOpen: false,
     allowRecursion: false,
+    requiredSchemaName: 'FarCon 2025 Pass',
   },
 ] as AttestationSchema[];
