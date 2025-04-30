@@ -28,6 +28,10 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     parentAuthorFname
   );
 
+  const schema = attestationSchemas.find(
+    (schema) => schema.name === schemaName
+  );
+
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
     if (attesterAddress === '0x') {
@@ -36,9 +40,6 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
 
     const attesteeAddress = await getEthAddressForFname(attesteeFname);
 
-    const schema = attestationSchemas.find(
-      (schema) => schema.name === schemaName
-    );
     const json: IcebreakerStoreCredentialsParams = {
       attesterAddress: attesterAddress,
       attesteeAddress: attesteeAddress,
@@ -61,7 +62,12 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         body: JSON.stringify(json),
       });
 
-      const castData = getReplyCastData(isValid, schemaName, response.ok);
+      const castData = getReplyCastData(
+        isValid,
+        schemaName,
+        schema?.requiredSchemaName,
+        response.ok
+      );
 
       await neynarClient.publishCast(
         process.env.NEYNAR_SIGNER_UUID ?? '',
