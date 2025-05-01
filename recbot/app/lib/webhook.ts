@@ -78,6 +78,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         }
       );
     } catch (err) {
+      console.error(err);
       return (err as Error).message;
     }
   } else {
@@ -90,6 +91,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         }
       );
     } catch (err) {
+      console.error('Error publishing cast:', err);
       return (err as Error).message;
     }
   }
