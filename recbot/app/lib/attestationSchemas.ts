@@ -113,4 +113,23 @@ export const attestationSchemas = [
     allowRecursion: false,
     requiredSchemaName: 'FarCon 2025 Pass',
   },
+  {
+    id: 'recbot:winner:omahawinner',
+    name: 'Omaha Winner',
+    isOpen: false,
+    allowRecursion: false,
+    requiredFnames: ['garrett', 'web3pm'],
+  },
+  {
+    id: 'recbot:endorsement:vibes',
+    name: 'Vibes',
+    isOpen: false,
+    allowRecursion: true,
+  },
+  {
+    id: 'recbot:membership:lawpolicy',
+    name: 'Law Policy',
+    isOpen: false,
+    allowRecursion: true,
+  },
 ] as AttestationSchema[];

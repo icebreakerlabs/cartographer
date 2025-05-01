@@ -71,10 +71,14 @@ export async function canFnameAttestToSchema(
     return false;
   }
 
-  const { isOpen, allowRecursion, requiredSchemaName, name } = schema;
+  const { isOpen, allowRecursion, requiredSchemaName, name, requiredFnames } =
+    schema;
 
   if (isOpen) {
     return true;
+  }
+  if (requiredFnames) {
+    return requiredFnames.some((f) => f.toLowerCase() === fname?.toLowerCase());
   }
   if (allowRecursion || requiredSchemaName) {
     const icebreakerProfile = await getIcebreakerProfileFromFname(fname);

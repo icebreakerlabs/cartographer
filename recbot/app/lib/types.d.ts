@@ -22,6 +22,7 @@ export type AttestationSchema = {
   schemaEncoding?: string;
   filter?: Record<string, string | boolean>;
   requiredSchemaName?: string;
+  requiredFnames?: string[];
 };
 
 export type IcebreakerChannel = {
