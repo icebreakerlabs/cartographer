@@ -60,6 +60,7 @@ export async function generateSimpleSearchQuery(cleanText: string) {
       The schema name should be the most relevant schema name for the provided text.
       The schema name should be the most specific schema name for the provided text.
       The schema name should be the most accurate schema name for the provided text.
+      If the text is a negative statement, return 'undefined'.
       If the text is not a valid schema name, return 'undefined'.
     `,
     '<attestionSchemas>' + JSON.stringify(attestationSchemas) + '</attestionSchemas> <text>' + cleanText + '</text>',

@@ -29,7 +29,7 @@ const webhook = {
     parent_hash: null,
     parent_url: null,
     root_parent_url: null,
-    text: "@rec bot @alice has amazing Engineering abilities!",
+    text: "@rec bot @alice has terrible Engineering abilities!",
     mentioned_profiles: [
       {
         object: "user",
