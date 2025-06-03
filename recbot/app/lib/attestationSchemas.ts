@@ -132,4 +132,12 @@ export const attestationSchemas = [
     isOpen: false,
     allowRecursion: true,
   },
+  {
+    id: 'recbot:endorsement:celoog',
+    name: 'Celo OG',
+    source: 'Farcaster',
+    description: 'Celo OG endorsements from recbot via Farcaster',
+    isOpen: true,
+    allowRecursion: false,
+  },
 ] as AttestationSchema[];
