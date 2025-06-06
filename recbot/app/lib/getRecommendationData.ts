@@ -29,13 +29,10 @@ export const getRecommendationData = async (
     return { attesteeFname: '', schemaName: '', isValid: false };
   }
 
-  const escapeRegex = (str: string) =>
-    str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
   const usernamesToRemove = [...mentionedUsernames, botUsername].map(
-    (username) => `@${escapeRegex(username)}`
+    (username) => `@${username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
   );
-  // Create regex to filter out usernames
+  
   const usernamesRegex = new RegExp(usernamesToRemove.join('|'), 'gi');
   const cleanText = text
     .replace(usernamesRegex, '')
@@ -46,16 +43,18 @@ export const getRecommendationData = async (
   if (!cleanText) {
     return { attesteeFname, schemaName: '', isValid: false };
   }
-  // had to add await here because getSchema is async
+
   const matchedSchema = await getSchema(cleanText);
 
-  if (matchedSchema) {
-    const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
-    return {
-      attesteeFname,
-      schemaName: matchedSchema.name,
-      isValid,
-    };
+  if (!matchedSchema) {
+    return { attesteeFname, schemaName: cleanText, isValid: false };
   }
-  return { attesteeFname, schemaName: cleanText, isValid: false };
+
+  const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
+
+  return {
+    attesteeFname,
+    schemaName: matchedSchema.name,
+    isValid,
+  };
 };
