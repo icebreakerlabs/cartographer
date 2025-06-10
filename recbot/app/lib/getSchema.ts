@@ -4,7 +4,7 @@ import { type AttestationSchema } from './types';
 
 const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
 
-async function getSchema(cleanText: string): Promise<AttestationSchema | undefined> {
+export async function getSchema(cleanText: string): Promise<AttestationSchema | undefined> {
 
   const skillNames ='[' + attestationSchemas
        .flatMap(({ name }) => name.startsWith('Skill:') ? name : [])
