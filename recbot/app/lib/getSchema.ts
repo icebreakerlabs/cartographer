@@ -39,7 +39,7 @@ export async function getSchema(cleanText: string): Promise<AttestationSchema | 
     });
 
     return schemaName;
-  } catch (err) {
+  } catch {
   // Fallback logic if the Python subprocess fails
     return cleanText.startsWith('bot')
       ? attestationSchemas.find((schema) => schema.name === 'Feather Ice')
