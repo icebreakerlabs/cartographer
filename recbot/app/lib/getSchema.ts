@@ -6,34 +6,33 @@ const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
 
 export async function getSchema(cleanText: string): Promise<AttestationSchema | undefined> {
 
-  const skillNames ='[' + attestationSchemas
-       .flatMap(({ name }) => name.startsWith('Skill:') ? name : [])
-       .join(', ') + ']'
+  
   try{
     const schemaName = await new Promise<AttestationSchema | undefined>((resolve, reject) => {
-      const py = spawn("uv", ["run", "getSchema.py", cleanText, skillNames]);
+      const py = spawn("uv", ["run", "getSchema.py", cleanText]);
 
-      let output = '';
-      let error = '';
+      const output: string[] = [];
+      const error: string[] = [];
 
       py.stdout.on("data", (data) => {
-        output += data.toString();
+        output.push(data.toString());
       });
 
       py.stderr.on("data", (data) => {
-        error += data.toString();
+        error.push(data.toString());
       });
 
-      const schemaName = output.trim();
-      const matchedSchema = attestationSchemas.find(
-       ({ name }) => name.toLowerCase() === schemaName.toLowerCase()
-      );
-
       py.on("close", (code) => {
+        const finalOutput = output.join('').trim();
+        const finalError = error.join('').trim();
+        const matchedSchema = attestationSchemas.find(
+          ({ name }) => name.toLowerCase() === finalOutput.toLowerCase()
+        );
+
         if (code === 0 && matchedSchema) {
           resolve(matchedSchema || undefined);
         } else {
-          reject(new Error(error || `Python process exited with code ${code}`));
+          reject(new Error(finalError || `Python process exited with code ${code}`));
         }
       });
     });
