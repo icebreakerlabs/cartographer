@@ -1,5 +1,4 @@
 import { attestationSchemas } from './attestationSchemas';
-import { type AttestationSchema } from './types';
 
 // Define the new response type
 interface AttestationResponse {
