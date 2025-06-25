@@ -11,7 +11,7 @@ const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
 // New function to call the local API service
 async function callAttestationSchemaAPI(text: string): Promise<AttestationResponse | undefined> {
   try {
-    const response = await fetch('http://127.0.0.1:8000/get_attestation_schema', {
+    const response = await fetch('https://agent-production-ba4b.up.railway.app/get_attestation_schema', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -34,10 +34,18 @@ async function callAttestationSchemaAPI(text: string): Promise<AttestationRespon
       };
     }
     
-    // If skill is an object, extract the name
-    if (data.skill && typeof data.skill === 'object' && data.skill.name) {
+    // If skill is not a string (could be object, null, undefined, etc.)
+    if (data.skill && typeof data.skill !== 'string') {
+      // If it's an object with a name property, extract the name
+      if (typeof data.skill === 'object' && data.skill.name) {
+        return {
+          skill: data.skill.name,
+          bot_response: data.bot_response || ''
+        };
+      }
+      // For other non-string values (null, undefined, etc.), return undefined
       return {
-        skill: data.skill.name,
+        skill: undefined,
         bot_response: data.bot_response || ''
       };
     }
@@ -64,11 +72,9 @@ export async function getSchema(cleanText: string): Promise<AttestationResponse>
   let skillName: string | undefined;
   
   if (cleanText.startsWith('bot')) {
-    const skill = attestationSchemas.find((schema) => schema.name === 'Feather Ice');
-    skillName = skill?.name;
+    skillName = 'Feather Ice';
   } else if (ICE_CREAM_PATTERN.test(cleanText)) {
-    const skill = attestationSchemas.find((schema) => schema.name === 'Ice cream');
-    skillName = skill?.name;
+    skillName = 'Ice cream';
   } else {
     const skill = attestationSchemas.find((schema) =>
       cleanText.includes(schema.name.toLowerCase())
@@ -81,6 +87,4 @@ export async function getSchema(cleanText: string): Promise<AttestationResponse>
     bot_response: skillName ? `Found skill: ${skillName}` : 'No skill found'
   };
 }
-
-getSchema('charlie is great at engineering').then(console.log)
 
