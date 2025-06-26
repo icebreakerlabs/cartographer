@@ -9,16 +9,16 @@ import {
   getEthAddressForFname,
   getEthAddressForUser,
   ICEBREAKER_API_URL,
-  neynarClient,
 } from './utils';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
 import { getReplyCastData } from './getReplyCastData';
+import { getSignerUuid, neynar } from './neynar';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
   const parentAuthorFname = parentAuthorFid
-    ? (await neynarClient.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]?.username
+    ? (await neynar.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]?.username
     : undefined;
 
   const { isValid, attesteeFname, schemaName } = await getRecommendationData(
@@ -31,6 +31,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
   const schema = attestationSchemas.find(
     (schema) => schema.name === schemaName
   );
+
+  const signerUuid = await getSignerUuid();
 
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
@@ -69,8 +71,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         response.ok
       );
 
-      await neynarClient.publishCast({
-        signerUuid: process.env.NEYNAR_SIGNER_UUID ?? '',
+      await neynar.publishCast({
+        signerUuid,
         text: castData.text,
         parent: webhook.data.hash,
         embeds: castData.embeds,
@@ -81,8 +83,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     }
   } else {
     try {
-      await neynarClient.publishCast({
-        signerUuid: process.env.NEYNAR_SIGNER_UUID ?? '',
+      await neynar.publishCast({
+        signerUuid,
         text: getReplyCastData(isValid, schemaName).text,
         parent: webhook.data.hash,
       });
