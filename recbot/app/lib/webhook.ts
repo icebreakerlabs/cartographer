@@ -18,7 +18,7 @@ import { getReplyCastData } from './getReplyCastData';
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
   const parentAuthorFname = parentAuthorFid
-    ? (await neynarClient.fetchBulkUsers([parentAuthorFid])).users[0]?.username
+    ? (await neynarClient.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]?.username
     : undefined;
 
   const { isValid, attesteeFname, schemaName } = await getRecommendationData(
@@ -69,27 +69,23 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         response.ok
       );
 
-      await neynarClient.publishCast(
-        process.env.NEYNAR_SIGNER_UUID ?? '',
-        castData.text,
-        {
-          replyTo: webhook.data.hash,
-          embeds: castData.embeds,
-        }
-      );
+      await neynarClient.publishCast({
+        signerUuid: process.env.NEYNAR_SIGNER_UUID ?? '',
+        text: castData.text,
+        parent: webhook.data.hash,
+        embeds: castData.embeds,
+      });
     } catch (err) {
       console.error(err);
       return (err as Error).message;
     }
   } else {
     try {
-      await neynarClient.publishCast(
-        process.env.NEYNAR_SIGNER_UUID ?? '',
-        getReplyCastData(isValid, schemaName).text,
-        {
-          replyTo: webhook.data.hash,
-        }
-      );
+      await neynarClient.publishCast({
+        signerUuid: process.env.NEYNAR_SIGNER_UUID ?? '',
+        text: getReplyCastData(isValid, schemaName).text,
+        parent: webhook.data.hash,
+      });
     } catch (err) {
       console.error('Error publishing cast:', err);
       return (err as Error).message;

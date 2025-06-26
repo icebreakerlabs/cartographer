@@ -1,93 +1,94 @@
 import { attestationSchemas } from './attestationSchemas';
-import { type AttestationSchema } from './types';
-import { timeout } from './promises';
 
-import { createOpenAI } from '@ai-sdk/openai';
-import { generateText } from 'ai';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-const openai = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+type AttestationResponse = {
+  skill?: string | { name: string };
+  bot_response: string;
+};
 
 const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
-const LLM_DEFAULT_TIMEOUT = 10000;
-const DEFAULT_MODEL: Parameters<typeof openai>[0] = 'gpt-4o';
-const SYSTEM_PROMPT = `
-You are an expert at extracting skill endorsements from text.  
-You are given a list of possible skill schema names (schemaNameString), each starting with "Skill:".  
-Your job is to analyze the provided text and determine which, if any, of these skills are being positively recommended or endorsed.
-`;
+const RAILWAY_API_URL = 'https://agent-production-ba4b.up.railway.app/get_attestation_schema';
 
-
-
-function getPromptTemplate(schemaNamesString: string, cleanText: string) {
-  return `
-    Instructions:
-    - Only consider skills from the provided schemaNamesString that start with "Skill:".
-    - If the text contains a positive recommendation or endorsement for one of these skills, return the exact name of the skill as they appear in schemaNameString(e.g. "Skill: Engineering").
-    - If the text does not contain a positive recommendation for any of the skills, return 'undefined'.
-    - Do not return skills that are not positively recommended.
-    - Do not return any skills that are not in the schemaNameString.
-    - Ignore negative statements or criticisms about skills.
-
-    schemaNamesString: ${schemaNamesString}
-    text: ${cleanText}
-  `;
-}
-
-export async function askAI(
-  systemPrompt: string,
-  prompt: string,
-  timeoutMs = LLM_DEFAULT_TIMEOUT,
-  model = DEFAULT_MODEL,
-) {
+async function getAttestationSkillAndMessage(text: string): Promise<{
+  skill: string | undefined;
+  message: string;
+}> {
   try {
-    const { text } = await timeout(
-      generateText({
-        model: openai(model),
-        system: systemPrompt,
-        prompt,
-        temperature: 0.7,
-        maxTokens: 5000,
-      }),
-      timeoutMs,
-    );
+    const response = await fetch(RAILWAY_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    });
 
-    return text;
+    if (!response.ok) {
+      throw new Error(`API call failed with status: ${response.status}`);
+    }
+
+    const data: AttestationResponse = await response.json();
+
+    if (!data.skill) {
+      return {
+        skill: undefined,
+        message: data.bot_response || ''
+      };
+    }
+    
+    if (typeof data.skill === 'string') {
+      return {
+        skill: data.skill,
+        message: data.bot_response
+      };
+    }
+
+    return {
+      skill: data.skill.name,
+      message: data.bot_response
+    };
   } catch (error) {
-    console.error('Error generating response:', error);
-    return '';
+    console.error('Error calling attestation schema API:', error);
+    return {
+      skill: undefined,
+      message: ''
+    };
   }
 }
 
-export async function getSchema(cleanText: string): Promise<AttestationSchema | undefined> {
-  const llmResult = await askAI(
-    SYSTEM_PROMPT, 
-    getPromptTemplate(
-      attestationSchemas
-        .flatMap(({ name }) => name.startsWith('Skill:') ? name : [])
-        .join(', '),
-      cleanText
-    )
-  );
+export async function getSchema(cleanText: string) {
+  const skillAndMessage = await getAttestationSkillAndMessage(cleanText);
 
-  const schemaName = llmResult?.trim();
-  const matchedSchema = attestationSchemas.find(
-    ({ name }) => name.toLowerCase() === schemaName.toLowerCase()
-  );
-
-  if (matchedSchema) {
-    return matchedSchema;
+  if (skillAndMessage) {
+    return skillAndMessage;
   }
 
-  return cleanText.startsWith('bot')
-    ? attestationSchemas.find((schema) => schema.name === 'Feather Ice')
-    : ICE_CREAM_PATTERN.test(cleanText)
-    ? attestationSchemas.find((schema) => schema.name === 'Ice cream')
-    : attestationSchemas.find((schema) =>
-        cleanText.includes(schema.name.toLowerCase())
-      );
+  if (cleanText.startsWith('bot')) {
+    return {
+      skill: 'Feather Ice',
+      message: 'Found skill: Feather Ice'
+    };
+  }
+
+  if (ICE_CREAM_PATTERN.test(cleanText)) {
+    return {
+      skill: 'Ice cream',
+      message: 'Found skill: Ice cream'
+    };
+  }
+
+  const skill = attestationSchemas.find((schema) =>
+    cleanText.includes(schema.name.toLowerCase())
+  );
+
+  if (skill) {
+    return {
+      skill: skill.name,
+      message: `Found skill: ${skill.name}`
+    };
+  }
+
+  return {
+    skill: undefined,
+    message: 'No skill found'
+  };
 }
+
