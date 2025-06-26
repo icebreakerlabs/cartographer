@@ -1,4 +1,4 @@
-import { type User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
+import { type User } from '@neynar/nodejs-sdk/build/api';
 import { getSchema } from './getSchema';
 import { canFnameAttestToSchema } from './utils';
 import { attestationSchemas } from './attestationSchemas';
@@ -46,27 +46,25 @@ export const getRecommendationData = async (
     return { attesteeFname, schemaName: '', isValid: false };
   }
 
-  const attestationResponse = await getSchema(cleanText);
-  const skillName = attestationResponse.skill;
+  const { skill } = await getSchema(cleanText);
 
-  if (!skillName) {
+  if (!skill) {
     return { attesteeFname, schemaName: cleanText, isValid: false };
   }
 
-  // Find the full schema object to pass to canFnameAttestToSchema
   const matchedSchema = attestationSchemas.find(
-    (schema: AttestationSchema) => schema.name.toLowerCase() === skillName.toLowerCase()
+    (schema: AttestationSchema) => schema.name.toLowerCase() === skill.toLowerCase()
   );
 
   if (!matchedSchema) {
-    return { attesteeFname, schemaName: skillName, isValid: false };
+    return { attesteeFname, schemaName: skill, isValid: false };
   }
 
   const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
 
   return {
     attesteeFname,
-    schemaName: skillName,
+    schemaName: skill,
     isValid,
   };
 };

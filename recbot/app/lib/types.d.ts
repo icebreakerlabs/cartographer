@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { type User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
+import { type User } from '@neynar/nodejs-sdk/build/api';
 
 export type AttestationSource =
   | 'EAS'
