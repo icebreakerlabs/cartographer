@@ -5,11 +5,9 @@ import {
   type WebhookData,
 } from './types';
 import {
-  getEthAddressForFname,
   getEthAddressForUser,
 } from './utils';
 import { getRecommendationData } from './getRecommendationData';
-import { attestationSchemas } from './attestationSchemas';
 import { getSignerUuid, neynar } from './neynar';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
@@ -18,7 +16,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     ? (await neynar.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]?.username
     : undefined;
 
-  const { isValid, attesteeFname, schemaName, botResponse } = await getRecommendationData(
+  const { isValid, botResponse } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
@@ -48,7 +46,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     try {
       await neynar.publishCast({
         signerUuid,
-        text: getReplyCastData(isValid, schemaName).text,
+        text: botResponse,
         parent: webhook.data.hash,
       });
     } catch (err) {
