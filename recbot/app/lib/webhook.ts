@@ -55,14 +55,6 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     };
 
     try {
-      const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
-        },
-        body: JSON.stringify(json),
-      });
 
       await neynar.publishCast({
         signerUuid,
