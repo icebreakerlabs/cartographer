@@ -2,7 +2,6 @@
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
 import {
-  type IcebreakerStoreCredentialsParams,
   type WebhookData,
 } from './types';
 import {
@@ -26,10 +25,6 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     parentAuthorFname
   );
 
-  const schema = attestationSchemas.find(
-    (schema) => schema.name === schemaName
-  );
-
   const signerUuid = await getSignerUuid();
 
   if (isValid) {
@@ -37,20 +32,6 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     if (attesterAddress === '0x') {
       throw new Error('Attester address not found');
     }
-
-    const attesteeAddress = await getEthAddressForFname(attesteeFname);
-
-    const json: IcebreakerStoreCredentialsParams = {
-      attesterAddress: attesterAddress,
-      attesteeAddress: attesteeAddress,
-      isPublic: true,
-      name: schemaName,
-      schemaID: schema?.id ?? '-1',
-      source: 'Farcaster',
-      reference: webhook.data.hash,
-      timestamp: webhook.data.timestamp,
-      uid: `${webhook.data.hash}000000000000000000000000`,
-    };
 
     try {
 
