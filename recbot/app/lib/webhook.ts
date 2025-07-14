@@ -55,21 +55,26 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     };
 
     try {
-      const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
-        },
-        body: JSON.stringify(json),
-      });
+      // const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
+      //   method: 'PUT',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
+      //   },
+      //   body: JSON.stringify(json),
+      // });
+
+      // console.log('response ok: ', response.ok);
+      
 
       const castData = getReplyCastData(
         isValid,
         schemaName,
         schema?.requiredSchemaName,
-        response.ok
+        true
       );
+      console.log('isValid: ', isValid);
+      console.log('schemaName: ', schemaName);
       console.log('published cast: ', castData.text);
 
       // await neynar.publishCast({
@@ -89,6 +94,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       //   text: getReplyCastData(isValid, schemaName).text,
       //   parent: webhook.data.hash,
       // });
+      console.log('isValid: ', isValid);
+      console.log('schemaName: ', schemaName);
       console.log('published cast: ', getReplyCastData(isValid, schemaName).text);
     } catch (err) {
       console.error('Error publishing cast:', err);
@@ -165,7 +172,7 @@ const testWebhook: WebhookData = {
     embeds: [],
     reactions: { likes: [], recasts: [], likes_count: 0, recasts_count: 0 },
     replies: { count: 0 },
-    mentioned_profiles: [],
+    mentioned_profiles: [{ username: 'charlie' } as any],
     channel: null,
     event_timestamp: "2024-02-15T19:23:22.000Z"
   }

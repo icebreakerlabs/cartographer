@@ -18,7 +18,8 @@ export function getReplyCastData(
 
   const encodedCredentialName = encodeURIComponent(schemaName);
   const url = `${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=receivers`;
-
+  console.log('schemaName:', schemaName);
+  console.log('isSuccess:', isSuccess)
   if (isSuccess) {
     switch (schemaName) {
       case 'Ice cream':
