@@ -8,6 +8,7 @@ type RecommendationDataResponse = {
   attesteeFname: string;
   schemaName: string;
   isValid: boolean;
+  botResponse: string;
 };
 
 export const getRecommendationData = async (
@@ -19,7 +20,7 @@ export const getRecommendationData = async (
   const botUsername = 'rec';
   const startsWithBot = text.startsWith(`@${botUsername}`);
   if (!startsWithBot) {
-    return { attesteeFname: '', schemaName: 'b', isValid: false };
+    return { attesteeFname: '', schemaName: 'b', isValid: false, botResponse: '' };
   }
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
@@ -28,7 +29,7 @@ export const getRecommendationData = async (
   const attesteeFname = mentionedUsernames[0] || parentFname;
 
   if (!attesteeFname) {
-    return { attesteeFname: '', schemaName: '', isValid: false };
+    return { attesteeFname: '', schemaName: '', isValid: false, botResponse: '' };
   }
 
   const usernamesToRemove = [...mentionedUsernames, botUsername].map(
@@ -43,13 +44,13 @@ export const getRecommendationData = async (
     .trim();
 
   if (!cleanText) {
-    return { attesteeFname, schemaName: '', isValid: false };
+    return { attesteeFname, schemaName: '', isValid: false, botResponse: '' };
   }
 
-  const { skill } = await getSchema(cleanText);
+  const { skill, message } = await getSchema(cleanText);
 
   if (!skill) {
-    return { attesteeFname, schemaName: cleanText, isValid: false };
+    return { attesteeFname, schemaName: cleanText, isValid: false, botResponse: '' };
   }
 
   const matchedSchema = attestationSchemas.find(
@@ -57,7 +58,7 @@ export const getRecommendationData = async (
   );
 
   if (!matchedSchema) {
-    return { attesteeFname, schemaName: skill, isValid: false };
+    return { attesteeFname, schemaName: skill, isValid: false, botResponse: '' };
   }
 
   const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
@@ -66,5 +67,6 @@ export const getRecommendationData = async (
     attesteeFname,
     schemaName: skill,
     isValid,
+    botResponse: message,
   };
 };

@@ -21,7 +21,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     ? (await neynar.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]?.username
     : undefined;
 
-  const { isValid, attesteeFname, schemaName } = await getRecommendationData(
+  const { isValid, attesteeFname, schemaName, botResponse } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
@@ -64,18 +64,10 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         body: JSON.stringify(json),
       });
 
-      const castData = getReplyCastData(
-        isValid,
-        schemaName,
-        schema?.requiredSchemaName,
-        response.ok
-      );
-
       await neynar.publishCast({
         signerUuid,
-        text: castData.text,
+        text: botResponse,
         parent: webhook.data.hash,
-        embeds: castData.embeds,
       });
     } catch (err) {
       console.error(err);
