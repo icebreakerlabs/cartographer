@@ -2,13 +2,12 @@
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
 import {
-  type IcebreakerStoreCredentialsParams,
+  //type IcebreakerStoreCredentialsParams,
   type WebhookData,
 } from './types';
 import {
-  getEthAddressForFname,
+  //getEthAddressForFname,
   getEthAddressForUser,
-  ICEBREAKER_API_URL,
 } from './utils';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
@@ -21,7 +20,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     ? (await neynar.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]?.username
     : undefined;
 
-  const { isValid, attesteeFname, schemaName } = await getRecommendationData(
+  const { isValid, schemaName } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
@@ -40,19 +39,19 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       throw new Error('Attester address not found');
     }
 
-    const attesteeAddress = await getEthAddressForFname(attesteeFname);
+    // const attesteeAddress = await getEthAddressForFname(attesteeFname);
 
-    const json: IcebreakerStoreCredentialsParams = {
-      attesterAddress: attesterAddress,
-      attesteeAddress: attesteeAddress,
-      isPublic: true,
-      name: schemaName,
-      schemaID: schema?.id ?? '-1',
-      source: 'Farcaster',
-      reference: webhook.data.hash,
-      timestamp: webhook.data.timestamp,
-      uid: `${webhook.data.hash}000000000000000000000000`,
-    };
+    // const json: IcebreakerStoreCredentialsParams = {
+    //   attesterAddress: attesterAddress,
+    //   attesteeAddress: attesteeAddress,
+    //   isPublic: true,
+    //   name: schemaName,
+    //   schemaID: schema?.id ?? '-1',
+    //   source: 'Farcaster',
+    //   reference: webhook.data.hash,
+    //   timestamp: webhook.data.timestamp,
+    //   uid: `${webhook.data.hash}000000000000000000000000`,
+    // };
 
     try {
       // const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
@@ -137,46 +136,3 @@ export async function verifyWebhookSignature(req: NextRequest): Promise<any> {
   }
   return body;
 }
-
-// Test the function with a sample webhook
-const testWebhook: WebhookData = {
-  created_at: 1708025006,
-  type: "cast.created",
-  data: {
-    object: "cast",
-    hash: "0xfe7908021a4c0d36d5f7359975f4bf6eb9fbd6f2",
-    thread_hash: "0xfe7908021a4c0d36d5f7359975f4bf6eb9fbd6f2",
-    parent_hash: null,
-    parent_url: null,
-    root_parent_url: null,
-    parent_author: { fid: null },
-    author: {
-      object: "user",
-      fid: 234506,
-      custody_address: "0x3ee6076e78c6413c8a3e1f073db01f87b63923b0",
-      username: "balzgolf",
-      display_name: "Balzgolf",
-      pfp_url: "https://i.imgur.com/U7ce6gU.jpg",
-      profile: {} as any,
-      follower_count: 65,
-      following_count: 110,
-      verifications: ["0x8c16c47095a003b726ce8deffc39ee9cb1b9f124"],
-      verified_addresses: { eth_addresses: [], sol_addresses: [], primary: {} as any },
-      verified_accounts: [],
-      power_badge: false,
-      score: 0,
-      active_status: "inactive"
-    } as any,
-    text: "@rec @charlie is a wonderful engineer",
-    timestamp: "2024-02-15T19:23:22.000Z",
-    embeds: [],
-    reactions: { likes: [], recasts: [], likes_count: 0, recasts_count: 0 },
-    replies: { count: 0 },
-    mentioned_profiles: [{ username: 'charlie' } as any],
-    channel: null,
-    event_timestamp: "2024-02-15T19:23:22.000Z"
-  }
-};
-
-// Uncomment the line below to run the test
-extractEndorsementFromCast(testWebhook);
