@@ -6,7 +6,7 @@ type AttestationResponse = {
 };
 
 const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
-const RAILWAY_API_URL = 'https://agent-production-ba4b.up.railway.app/get_attestation_schema';
+const RAILWAY_API_URL = 'https://agent-agent-pr-17.up.railway.app/get_attestation_schema';
 
 async function getAttestationSkillAndMessage(text: string): Promise<{
   skill: string | undefined;

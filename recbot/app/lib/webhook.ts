@@ -70,24 +70,26 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         schema?.requiredSchemaName,
         response.ok
       );
+      console.log('published cast: ', castData.text);
 
-      await neynar.publishCast({
-        signerUuid,
-        text: castData.text,
-        parent: webhook.data.hash,
-        embeds: castData.embeds,
-      });
+      // await neynar.publishCast({
+      //   signerUuid,
+      //   text: castData.text,
+      //   parent: webhook.data.hash,
+      //   embeds: castData.embeds,
+      // });
     } catch (err) {
       console.error(err);
       return (err as Error).message;
     }
   } else {
     try {
-      await neynar.publishCast({
-        signerUuid,
-        text: getReplyCastData(isValid, schemaName).text,
-        parent: webhook.data.hash,
-      });
+      // await neynar.publishCast({
+      //   signerUuid,
+      //   text: getReplyCastData(isValid, schemaName).text,
+      //   parent: webhook.data.hash,
+      // });
+      console.log('published cast: ', getReplyCastData(isValid, schemaName).text);
     } catch (err) {
       console.error('Error publishing cast:', err);
       return (err as Error).message;
