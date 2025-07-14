@@ -13,7 +13,7 @@ import {
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
 import { getReplyCastData } from './getReplyCastData';
-import { getSignerUuid, neynar } from './neynar';
+import { neynar } from './neynar';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
@@ -32,7 +32,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     (schema) => schema.name === schemaName
   );
 
-  const signerUuid = await getSignerUuid();
+  // const signerUuid = await getSignerUuid();
 
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
