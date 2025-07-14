@@ -8,11 +8,9 @@ import {
 import {
   getEthAddressForFname,
   getEthAddressForUser,
-  ICEBREAKER_API_URL,
 } from './utils';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
-import { getReplyCastData } from './getReplyCastData';
 import { getSignerUuid, neynar } from './neynar';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
