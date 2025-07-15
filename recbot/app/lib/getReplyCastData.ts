@@ -7,13 +7,15 @@ export function getReplyCastData(
   isSuccess?: boolean,
   message?: string
 ): { text: string; embeds?: { url: string }[] } {
+  if (requiredSchemaName && !isSuccess) {
+    return {
+      text: `Oops! You must receive an endorsement for ${requiredSchemaName} before you can endorse others.`,
+    };
+  }
+
   if (!isValidRecommendation || !schemaName) {
     return {
-      text: schemaName
-        ? `Oops! You must receive an endorsement for ${
-            requiredSchemaName ?? schemaName
-          } before you can endorse others.`
-        : message ?? 'Beep boop. Something went wrong.',
+      text: message ?? 'Beep boop. Something went wrong.',
     };
   }
 
