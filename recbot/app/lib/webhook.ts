@@ -2,19 +2,19 @@
 import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
 import {
-  //type IcebreakerStoreCredentialsParams,
+  type IcebreakerStoreCredentialsParams,
   type WebhookData,
 } from './types';
 import {
-  //getEthAddressForFname,
+  getEthAddressForFname,
   getEthAddressForUser,
-  //ICEBREAKER_API_URL,
+  ICEBREAKER_API_URL,
 } from './utils';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
 import { getReplyCastData } from './getReplyCastData';
 import { neynar } from './neynar';
-// import { getSignerUuid } from './neynar';
+import { getSignerUuid } from './neynar';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
@@ -24,7 +24,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
 
   console.log('webhook.data.text: ', webhook.data.text);
 
-  const { isValid, schemaName, message, /*attesteeFname */} = await getRecommendationData(
+  const { isValid, schemaName, message, attesteeFname } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
@@ -35,7 +35,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     (schema) => schema.name === schemaName
   );
 
-  //const signerUuid = await getSignerUuid();
+  const signerUuid = await getSignerUuid();
 
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
@@ -43,31 +43,31 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       throw new Error('Attester address not found');
     }
 
-    // const attesteeAddress = await getEthAddressForFname(attesteeFname);
+    const attesteeAddress = await getEthAddressForFname(attesteeFname);
 
-    // const json: IcebreakerStoreCredentialsParams = {
-    //   attesterAddress: attesterAddress,
-    //   attesteeAddress: attesteeAddress,
-    //   isPublic: true,
-    //   name: schemaName,
-    //   schemaID: schema?.id ?? '-1',
-    //   source: 'Farcaster',
-    //   reference: webhook.data.hash,
-    //   timestamp: webhook.data.timestamp,
-    //   uid: `${webhook.data.hash}000000000000000000000000`,
-    // };
+    const json: IcebreakerStoreCredentialsParams = {
+      attesterAddress: attesterAddress,
+      attesteeAddress: attesteeAddress,
+      isPublic: true,
+      name: schemaName,
+      schemaID: schema?.id ?? '-1',
+      source: 'Farcaster',
+      reference: webhook.data.hash,
+      timestamp: webhook.data.timestamp,
+      uid: `${webhook.data.hash}000000000000000000000000`,
+    };
 
     try {
-    //   const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
-    //     method: 'PUT',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
-    //     },
-    //     body: JSON.stringify(json),
-    //   });
+      const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
+        },
+        body: JSON.stringify(json),
+      });
 
-      // console.log('response ok: ', response.ok);
+      console.log('response ok: ', response.ok);
       
 
       const castData = getReplyCastData(
@@ -75,29 +75,29 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         schemaName,
         message,
         schema?.requiredSchemaName,
-        true, //replace with response.ok
+        response.ok,
       );
       console.log('isValid: ', isValid);
       console.log('schemaName: ', schemaName);
       console.log('published cast: ', castData.text);
 
-      // await neynar.publishCast({
-      //   signerUuid,
-      //   text: castData.text,
-      //   parent: webhook.data.hash,
-      //   embeds: castData.embeds,
-      // });
+      await neynar.publishCast({
+        signerUuid,
+        text: castData.text,
+        parent: webhook.data.hash,
+        embeds: castData.embeds,
+      });
     } catch (err) {
       console.error(err);
       return (err as Error).message;
     }
   } else {
     try {
-      // await neynar.publishCast({
-      //   signerUuid,
-      //   text: getReplyCastData(isValid, schemaName, message).text,
-      //   parent: webhook.data.hash,
-      // });
+      await neynar.publishCast({
+        signerUuid,
+        text: getReplyCastData(isValid, schemaName, message).text,
+        parent: webhook.data.hash,
+      });
       console.log('isValid:', isValid);
       console.log('schemaName:', schemaName);
       console.log('published cast:', getReplyCastData(isValid, schemaName, message).text);
