@@ -6,7 +6,12 @@ type AttestationResponse = {
 };
 
 const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
-const RAILWAY_API_URL = 'https://agent-agent-pr-17.up.railway.app/get_attestation_schema';
+const RAILWAY_API_URL = process.env.ICEBREAKER_AGENT_API_ENDPOINT || '';
+
+
+if (!RAILWAY_API_URL) {
+  throw new Error('ICEBREAKER_AGENT_API_ENDPOINT is not set');
+}
 
 async function getAttestationSkillAndMessage(text: string): Promise<{
   skill: string | undefined;
