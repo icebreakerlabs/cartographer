@@ -8,11 +8,13 @@ import {
 import {
   //getEthAddressForFname,
   getEthAddressForUser,
+  //ICEBREAKER_API_URL,
 } from './utils';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
 import { getReplyCastData } from './getReplyCastData';
 import { neynar } from './neynar';
+// import { getSignerUuid } from './neynar';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
@@ -22,7 +24,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
 
   console.log('webhook.data.text: ', webhook.data.text);
 
-  const { isValid, schemaName, message } = await getRecommendationData(
+  const { isValid, schemaName, message, /*attesteeFname */} = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
@@ -33,7 +35,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     (schema) => schema.name === schemaName
   );
 
-  // const signerUuid = await getSignerUuid();
+  //const signerUuid = await getSignerUuid();
 
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
@@ -56,14 +58,14 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     // };
 
     try {
-      // const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
-      //   },
-      //   body: JSON.stringify(json),
-      // });
+    //   const response = await fetch(`${ICEBREAKER_API_URL}/v1/credentials`, {
+    //     method: 'PUT',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       Authorization: `Bearer ${process.env.ICEBREAKER_BEARER_TOKEN}`,
+    //     },
+    //     body: JSON.stringify(json),
+    //   });
 
       // console.log('response ok: ', response.ok);
       
@@ -72,7 +74,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         isValid,
         schemaName,
         schema?.requiredSchemaName,
-        true,
+        true, //replace with response.ok
         message
       );
       console.log('isValid: ', isValid);
