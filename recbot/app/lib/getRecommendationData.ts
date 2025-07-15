@@ -49,7 +49,7 @@ export const getRecommendationData = async (
     return { attesteeFname, schemaName: '', isValid: false, message: 'No text found' };
   }
   console.log('finding schema for: ', cleanText);
-  const { skill, message } = await getSchema(cleanText);
+  const { skill, message } = await getSchema(text);
   console.log('found skill:', skill);
 
   if (!skill) {
