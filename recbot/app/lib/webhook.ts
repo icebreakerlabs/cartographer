@@ -96,6 +96,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       // });
       console.log('isValid: ', isValid);
       console.log('schemaName: ', schemaName);
+      console.log('message: ', message);
       console.log('published cast: ', getReplyCastData(isValid, schemaName, undefined, undefined, message).text);
     } catch (err) {
       console.error('Error publishing cast:', err);
