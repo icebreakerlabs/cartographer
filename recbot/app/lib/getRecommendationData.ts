@@ -18,9 +18,9 @@ export const getRecommendationData = async (
 ): Promise<RecommendationDataResponse> => {
   const botUsername = 'rec';
   const startsWithBot = text.startsWith(`@${botUsername}`);
-  if (!startsWithBot) {
-    return { attesteeFname: '', schemaName: 'b', isValid: false };
-  }
+  // if (!startsWithBot) {
+  //   return { attesteeFname: '', schemaName: 'b', isValid: false };
+  // }
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
     .filter((username) => username !== botUsername);
@@ -45,8 +45,9 @@ export const getRecommendationData = async (
   if (!cleanText) {
     return { attesteeFname, schemaName: '', isValid: false };
   }
-
+  console.log('finding schema for: ', cleanText);
   const { skill } = await getSchema(cleanText);
+  console.log('found skill:', skill);
 
   if (!skill) {
     return { attesteeFname, schemaName: cleanText, isValid: false };
