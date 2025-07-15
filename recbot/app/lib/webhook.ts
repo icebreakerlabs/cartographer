@@ -20,6 +20,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     ? (await neynar.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]?.username
     : undefined;
 
+  console.log('webhook.data.text: ', webhook.data.text);
+
   const { isValid, schemaName, message } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
