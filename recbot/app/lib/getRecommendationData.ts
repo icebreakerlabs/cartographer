@@ -53,7 +53,7 @@ export const getRecommendationData = async (
   console.log('found skill:', skill);
 
   if (!skill) {
-    return { attesteeFname, schemaName: cleanText, isValid: false, message: '' };
+    return { attesteeFname, schemaName: cleanText, isValid: false, message};
   }
 
   const matchedSchema = attestationSchemas.find(
@@ -61,7 +61,7 @@ export const getRecommendationData = async (
   );
 
   if (!matchedSchema) {
-    return { attesteeFname, schemaName: skill, isValid: false, message: '' };
+    return { attesteeFname, schemaName: skill, isValid: false, message};
   }
 
   const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
