@@ -17,7 +17,7 @@ export const getRecommendationData = async (
   parentFname?: string
 ): Promise<RecommendationDataResponse> => {
   const botUsername = 'rec';
-  const startsWithBot = text.startsWith(`@${botUsername}`);
+  // const startsWithBot = text.startsWith(`@${botUsername}`);
   // if (!startsWithBot) {
   //   return { attesteeFname: '', schemaName: 'b', isValid: false };
   // }
