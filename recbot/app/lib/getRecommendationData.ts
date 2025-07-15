@@ -43,12 +43,13 @@ export const getRecommendationData = async (
     .toLowerCase()
     .trim();
 
-  console.log('text: ', text);
-  console.log('cleanText: ', cleanText);
+  console.log('text:', text);
+  console.log('cleanText:', cleanText);
   
-  console.log('finding schema for: ', cleanText);
+  console.log('finding schema for:', text);
   const { skill, message } = await getSchema(text);
   console.log('found skill:', skill);
+  console.log('message:', message);
 
   // moved this down here to get a good message
   if (!attesteeFname) {

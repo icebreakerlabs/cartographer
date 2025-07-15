@@ -3,9 +3,10 @@ import { ICEBREAKER_CREDENTIALS_URL } from './utils';
 export function getReplyCastData(
   isValidRecommendation: boolean,
   schemaName?: string,
+  message?: string,
   requiredSchemaName?: string,
   isSuccess?: boolean,
-  message?: string
+
 ): { text: string; embeds?: { url: string }[] } {
   if (requiredSchemaName && !isSuccess) {
     return {

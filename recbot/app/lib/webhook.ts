@@ -73,9 +73,9 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       const castData = getReplyCastData(
         isValid,
         schemaName,
+        message,
         schema?.requiredSchemaName,
         true, //replace with response.ok
-        message
       );
       console.log('isValid: ', isValid);
       console.log('schemaName: ', schemaName);
@@ -95,13 +95,12 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     try {
       // await neynar.publishCast({
       //   signerUuid,
-      //   text: getReplyCastData(isValid, schemaName).text,
+      //   text: getReplyCastData(isValid, schemaName, message).text,
       //   parent: webhook.data.hash,
       // });
-      console.log('isValid: ', isValid);
-      console.log('schemaName: ', schemaName);
-      console.log('message: ', message);
-      console.log('published cast: ', getReplyCastData(isValid, schemaName, undefined, undefined, message).text);
+      console.log('isValid:', isValid);
+      console.log('schemaName:', schemaName);
+      console.log('published cast:', getReplyCastData(isValid, schemaName, message).text);
     } catch (err) {
       console.error('Error publishing cast:', err);
       return (err as Error).message;
