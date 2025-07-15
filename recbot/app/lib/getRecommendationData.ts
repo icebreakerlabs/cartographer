@@ -28,9 +28,9 @@ export const getRecommendationData = async (
 
   const attesteeFname = mentionedUsernames[0] || parentFname;
 
-  if (!attesteeFname) {
-    return { attesteeFname: '', schemaName: '', isValid: false, message: '' };
-  }
+  // if (!attesteeFname) {
+  //   return { attesteeFname: '', schemaName: '', isValid: false, message: 'No attestee found' };
+  // }
 
   const usernamesToRemove = [...mentionedUsernames, botUsername].map(
     (username) => `@${username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
@@ -45,12 +45,20 @@ export const getRecommendationData = async (
 
   console.log('text: ', text);
   console.log('cleanText: ', cleanText);
-  if (!cleanText) {
-    return { attesteeFname, schemaName: '', isValid: false, message: 'No text found' };
-  }
+  
   console.log('finding schema for: ', cleanText);
   const { skill, message } = await getSchema(text);
   console.log('found skill:', skill);
+
+  // moved this down here to get a good message
+  if (!attesteeFname) {
+    return { attesteeFname: '', schemaName: '', isValid: false, message: message ?? 'No attestee found' };
+  }
+
+  if (!cleanText) {
+    return { attesteeFname, schemaName: '', isValid: false, message: message ?? 'No text found' };
+  }
+
 
   if (!skill) {
     return { attesteeFname, schemaName: cleanText, isValid: false, message};
