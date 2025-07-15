@@ -43,8 +43,10 @@ export const getRecommendationData = async (
     .toLowerCase()
     .trim();
 
+  console.log('text: ', text);
+  console.log('cleanText: ', cleanText);
   if (!cleanText) {
-    return { attesteeFname, schemaName: '', isValid: false, message: '' };
+    return { attesteeFname, schemaName: '', isValid: false, message: 'No text found' };
   }
   console.log('finding schema for: ', cleanText);
   const { skill, message } = await getSchema(cleanText);
