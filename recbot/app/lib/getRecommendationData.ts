@@ -3,11 +3,12 @@ import { getSchema } from './getSchema';
 import { canFnameAttestToSchema } from './utils';
 import { attestationSchemas } from './attestationSchemas';
 import { type AttestationSchema } from './types';
-
+// message: the bot's response to the user's message
 type RecommendationDataResponse = {
   attesteeFname: string;
   schemaName: string;
   isValid: boolean;
+  message: string;
 };
 
 export const getRecommendationData = async (
@@ -28,7 +29,7 @@ export const getRecommendationData = async (
   const attesteeFname = mentionedUsernames[0] || parentFname;
 
   if (!attesteeFname) {
-    return { attesteeFname: '', schemaName: '', isValid: false };
+    return { attesteeFname: '', schemaName: '', isValid: false, message: '' };
   }
 
   const usernamesToRemove = [...mentionedUsernames, botUsername].map(
@@ -43,14 +44,14 @@ export const getRecommendationData = async (
     .trim();
 
   if (!cleanText) {
-    return { attesteeFname, schemaName: '', isValid: false };
+    return { attesteeFname, schemaName: '', isValid: false, message: '' };
   }
   console.log('finding schema for: ', cleanText);
-  const { skill } = await getSchema(cleanText);
+  const { skill, message } = await getSchema(cleanText);
   console.log('found skill:', skill);
 
   if (!skill) {
-    return { attesteeFname, schemaName: cleanText, isValid: false };
+    return { attesteeFname, schemaName: cleanText, isValid: false, message: '' };
   }
 
   const matchedSchema = attestationSchemas.find(
@@ -58,7 +59,7 @@ export const getRecommendationData = async (
   );
 
   if (!matchedSchema) {
-    return { attesteeFname, schemaName: skill, isValid: false };
+    return { attesteeFname, schemaName: skill, isValid: false, message: '' };
   }
 
   const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
@@ -67,5 +68,6 @@ export const getRecommendationData = async (
     attesteeFname,
     schemaName: skill,
     isValid,
+    message,
   };
 };

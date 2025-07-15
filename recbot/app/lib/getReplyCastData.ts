@@ -4,7 +4,8 @@ export function getReplyCastData(
   isValidRecommendation: boolean,
   schemaName?: string,
   requiredSchemaName?: string,
-  isSuccess?: boolean
+  isSuccess?: boolean,
+  message?: string
 ): { text: string; embeds?: { url: string }[] } {
   if (!isValidRecommendation || !schemaName) {
     return {
@@ -12,7 +13,7 @@ export function getReplyCastData(
         ? `Oops! You must receive an endorsement for ${
             requiredSchemaName ?? schemaName
           } before you can endorse others.`
-        : 'Unable to endorse. Make sure to format with: (at)rec (at)<username> <endorsement>',
+        : message ?? 'Beep boop. Something went wrong.',
     };
   }
 
