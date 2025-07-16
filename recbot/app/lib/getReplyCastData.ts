@@ -3,16 +3,20 @@ import { ICEBREAKER_CREDENTIALS_URL } from './utils';
 export function getReplyCastData(
   isValidRecommendation: boolean,
   schemaName?: string,
+  message?: string,
   requiredSchemaName?: string,
-  isSuccess?: boolean
+  isSuccess?: boolean,
+
 ): { text: string; embeds?: { url: string }[] } {
+  if (requiredSchemaName && !isSuccess) {
+    return {
+      text: `Oops! You must receive an endorsement for ${requiredSchemaName} before you can endorse others.`,
+    };
+  }
+
   if (!isValidRecommendation || !schemaName) {
     return {
-      text: schemaName
-        ? `Oops! You must receive an endorsement for ${
-            requiredSchemaName ?? schemaName
-          } before you can endorse others.`
-        : 'Unable to endorse. Make sure to format with: (at)rec (at)<username> <endorsement>',
+      text: message || 'Beep boop. Something went wrong.',
     };
   }
 

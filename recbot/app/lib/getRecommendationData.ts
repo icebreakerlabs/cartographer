@@ -8,6 +8,7 @@ type RecommendationDataResponse = {
   attesteeFname: string;
   schemaName: string;
   isValid: boolean;
+  message: string;
 };
 
 export const getRecommendationData = async (
@@ -17,10 +18,6 @@ export const getRecommendationData = async (
   parentFname?: string
 ): Promise<RecommendationDataResponse> => {
   const botUsername = 'rec';
-  const startsWithBot = text.startsWith(`@${botUsername}`);
-  if (!startsWithBot) {
-    return { attesteeFname: '', schemaName: 'b', isValid: false };
-  }
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
     .filter((username) => username !== botUsername);
@@ -28,7 +25,7 @@ export const getRecommendationData = async (
   const attesteeFname = mentionedUsernames[0] || parentFname;
 
   if (!attesteeFname) {
-    return { attesteeFname: '', schemaName: '', isValid: false };
+    return { attesteeFname: '', schemaName: '', isValid: false, message: 'No attestee found' };
   }
 
   const usernamesToRemove = [...mentionedUsernames, botUsername].map(
@@ -42,14 +39,18 @@ export const getRecommendationData = async (
     .toLowerCase()
     .trim();
 
-  if (!cleanText) {
-    return { attesteeFname, schemaName: '', isValid: false };
-  }
+  console.log('Processing text:', text);
 
-  const { skill } = await getSchema(cleanText);
+  if (!cleanText) {
+    return { attesteeFname, schemaName: '', isValid: false, message: 'No text found' };
+  }
+  
+  const { skill, message } = await getSchema(text);
+
+  console.log('Schema result:', { skill, message });
 
   if (!skill) {
-    return { attesteeFname, schemaName: cleanText, isValid: false };
+    return { attesteeFname, schemaName: cleanText, isValid: false, message };
   }
 
   const matchedSchema = attestationSchemas.find(
@@ -57,7 +58,7 @@ export const getRecommendationData = async (
   );
 
   if (!matchedSchema) {
-    return { attesteeFname, schemaName: skill, isValid: false };
+    return { attesteeFname, schemaName: skill, isValid: false, message };
   }
 
   const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
@@ -66,5 +67,6 @@ export const getRecommendationData = async (
     attesteeFname,
     schemaName: skill,
     isValid,
+    message,
   };
 };
