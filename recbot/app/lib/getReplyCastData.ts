@@ -16,14 +16,13 @@ export function getReplyCastData(
 
   if (!isValidRecommendation || !schemaName) {
     return {
-      text: message ?? 'Beep boop. Something went wrong.',
+      text: message || 'Beep boop. Something went wrong.',
     };
   }
 
   const encodedCredentialName = encodeURIComponent(schemaName);
   const url = `${ICEBREAKER_CREDENTIALS_URL}/${encodedCredentialName}?show=receivers`;
-  console.log('schemaName:', schemaName);
-  console.log('isSuccess:', isSuccess)
+
   if (isSuccess) {
     switch (schemaName) {
       case 'Ice cream':

@@ -4,7 +4,6 @@ import { canFnameAttestToSchema } from './utils';
 import { attestationSchemas } from './attestationSchemas';
 import { type AttestationSchema } from './types';
 
-
 type RecommendationDataResponse = {
   attesteeFname: string;
   schemaName: string;
@@ -47,13 +46,11 @@ export const getRecommendationData = async (
   }
   
   const { skill, message } = await getSchema(text);
+
   console.log('Schema result:', { skill, message });
 
-  
-
-
   if (!skill) {
-    return { attesteeFname, schemaName: cleanText, isValid: false, message};
+    return { attesteeFname, schemaName: cleanText, isValid: false, message };
   }
 
   const matchedSchema = attestationSchemas.find(
@@ -61,7 +58,7 @@ export const getRecommendationData = async (
   );
 
   if (!matchedSchema) {
-    return { attesteeFname, schemaName: skill, isValid: false, message};
+    return { attesteeFname, schemaName: skill, isValid: false, message };
   }
 
   const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);

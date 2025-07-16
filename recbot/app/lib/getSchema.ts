@@ -6,17 +6,16 @@ type AttestationResponse = {
 };
 
 const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
-const RAILWAY_API_URL = process.env.ICEBREAKER_AGENT_API_ENDPOINT || '';
-
-
-if (!RAILWAY_API_URL) {
-  throw new Error('ICEBREAKER_AGENT_API_ENDPOINT is not set');
-}
+const RAILWAY_API_URL = process.env.ICEBREAKER_AGENT_API_ENDPOINT;
 
 async function getAttestationSkillAndMessage(text: string): Promise<{
   skill: string | undefined;
   message: string;
 }> {
+  if (!RAILWAY_API_URL) {
+    throw new Error('ICEBREAKER_AGENT_API_ENDPOINT is not set');
+  }
+
   try {
     const response = await fetch(RAILWAY_API_URL, {
       method: 'POST',
