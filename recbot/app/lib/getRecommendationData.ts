@@ -3,7 +3,8 @@ import { getSchema } from './getSchema';
 import { canFnameAttestToSchema } from './utils';
 import { attestationSchemas } from './attestationSchemas';
 import { type AttestationSchema } from './types';
-// message: the bot's response to the user's message
+
+
 type RecommendationDataResponse = {
   attesteeFname: string;
   schemaName: string;
@@ -18,19 +19,15 @@ export const getRecommendationData = async (
   parentFname?: string
 ): Promise<RecommendationDataResponse> => {
   const botUsername = 'rec';
-  // const startsWithBot = text.startsWith(`@${botUsername}`);
-  // if (!startsWithBot) {
-  //   return { attesteeFname: '', schemaName: 'b', isValid: false };
-  // }
   const mentionedUsernames = mentioned_profiles
     .map((profile) => profile.username)
     .filter((username) => username !== botUsername);
 
   const attesteeFname = mentionedUsernames[0] || parentFname;
 
-  // if (!attesteeFname) {
-  //   return { attesteeFname: '', schemaName: '', isValid: false, message: 'No attestee found' };
-  // }
+  if (!attesteeFname) {
+    return { attesteeFname: '', schemaName: '', isValid: false, message: 'No attestee found' };
+  }
 
   const usernamesToRemove = [...mentionedUsernames, botUsername].map(
     (username) => `@${username.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
@@ -43,22 +40,16 @@ export const getRecommendationData = async (
     .toLowerCase()
     .trim();
 
-  console.log('text:', text);
-  console.log('cleanText:', cleanText);
-  
-  console.log('finding schema for:', text);
-  const { skill, message } = await getSchema(text);
-  console.log('found skill:', skill);
-  console.log('message:', message);
-
-  // moved this down here to get a good message
-  if (!attesteeFname) {
-    return { attesteeFname: '', schemaName: '', isValid: false, message: message ?? 'No attestee found' };
-  }
+  console.log('Processing text:', text);
 
   if (!cleanText) {
-    return { attesteeFname, schemaName: '', isValid: false, message: message ?? 'No text found' };
+    return { attesteeFname, schemaName: '', isValid: false, message: 'No text found' };
   }
+  
+  const { skill, message } = await getSchema(text);
+  console.log('Schema result:', { skill, message });
+
+  
 
 
   if (!skill) {
