@@ -4,7 +4,6 @@ import { canFnameAttestToSchema } from './utils';
 import { attestationSchemas } from './attestationSchemas';
 import { type AttestationSchema } from './types';
 
-
 type RecommendationDataResponse = {
   attesteeFname: string;
   schemaName: string;

@@ -13,8 +13,7 @@ import {
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
 import { getReplyCastData } from './getReplyCastData';
-import { neynar } from './neynar';
-import { getSignerUuid } from './neynar';
+import { getSignerUuid, neynar } from './neynar';
 
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
