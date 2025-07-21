@@ -37,6 +37,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
 
   if (isValid) {
     const attesterAddress = await getEthAddressForUser(webhook.data.author);
+
     if (attesterAddress === '0x') {
       throw new Error('Attester address not found');
     }
@@ -72,6 +73,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         schema?.requiredSchemaName,
         response.ok,
       );
+
       console.log('Publishing cast:', castData.text);
 
       await neynar.publishCast({
@@ -82,19 +84,24 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
       });
     } catch (err) {
       console.error(err);
+
       return (err as Error).message;
     }
   } else {
     try {
-      const errorCastData = getReplyCastData(isValid, schemaName, message);
+      const { text } = getReplyCastData(isValid, schemaName, message);
+
+      
       await neynar.publishCast({
         signerUuid,
-        text: errorCastData.text,
+        text,
         parent: webhook.data.hash,
       });
-      console.log('Publishing error cast:', errorCastData.text);
+      
+      console.log('Published error cast:', text);
     } catch (err) {
       console.error('Error publishing cast:', err);
+
       return (err as Error).message;
     }
   }
@@ -106,6 +113,7 @@ export async function processWebhookBody(webhook: WebhookData) {
   }
 
   await extractEndorsementFromCast(webhook);
+
   return { success: true };
 }
 
@@ -113,16 +121,19 @@ export async function verifyWebhookSignature(req: NextRequest): Promise<any> {
   const body = await req.text();
 
   const sig = req.headers.get('X-Neynar-Signature');
+
   if (!sig) {
     throw new Error('X-Neynar-Signature is missing from the request headers');
   }
 
   const webhookSecret = process.env.NEYNAR_WEBHOOK_SECRET;
+
   if (!webhookSecret) {
     throw new Error('Make sure to set NEYNAR_WEBHOOK_SECRET in your .env file');
   }
 
   const hmac = createHmac('sha512', webhookSecret);
+
   hmac.update(body);
 
   const generatedSignature = hmac.digest('hex');

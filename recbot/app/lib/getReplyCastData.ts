@@ -16,7 +16,7 @@ export function getReplyCastData(
 
   if (!isValidRecommendation || !schemaName) {
     return {
-      text: message ?? 'Beep boop. Something went wrong.',
+      text: message || 'Beep boop. Something went wrong.',
     };
   }
 
