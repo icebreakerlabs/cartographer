@@ -46,7 +46,7 @@ export const getRecommendationData = async (
   if (!cleanText) {
     return { attesteeFname, schemaName: '', isValid: false };
   }
-  const matchedSchema = getSchema(cleanText);
+  const matchedSchema = await getSchema(cleanText);
 
   if (matchedSchema) {
     const isValid = await canFnameAttestToSchema(authorFname, matchedSchema);
