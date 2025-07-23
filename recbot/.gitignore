@@ -38,3 +38,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test files - exclude from deployment
+/app/test/
+/app/api/test-cast/
+/app/api/test-reply-cast/

@@ -72,6 +72,16 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         response.ok
       );
 
+      console.log('getReplyCastData called with inputs and output:', {
+        inputs: {
+          isValid,
+          schemaName,
+          requiredSchemaName: schema?.requiredSchemaName,
+          responseOk: response.ok,
+        },
+        castData,
+      });
+
       await neynarClient.publishCast({
         signerUuid: NEYNAR_SIGNER_UUID,
         text: castData.text,
@@ -84,9 +94,15 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     }
   } else {
     try {
+      const castData = getReplyCastData(isValid, schemaName);
+      console.log('getReplyCastData called with inputs and output:', {
+        inputs: { isValid, schemaName },
+        castData,
+      });
+
       await neynarClient.publishCast({
         signerUuid: NEYNAR_SIGNER_UUID,
-        text: getReplyCastData(isValid, schemaName).text,
+        text: castData.text,
         parent: webhook.data.hash,
       });
     } catch (err) {
