@@ -1,16 +1,22 @@
-import { type AttestationSchema } from './types';
 import { attestationSchemas } from './attestationSchemas';
+import { getLLMSchema } from './getLlmSchema';
 
-const ICE_CREAM_PATTERN = /^(🍦|ice\s*cream|icecream)/i;
-
-export function getSchema(cleanText: string): AttestationSchema | undefined {
-  // TODO: Add LLM lookup for fuzzy matching
-
-  return cleanText.startsWith('bot')
+export async function getSchema(cleanText: string) {
+  const matchedSchema = cleanText.startsWith('bot')
     ? attestationSchemas.find((schema) => schema.name === 'Feather Ice')
-    : ICE_CREAM_PATTERN.test(cleanText)
-    ? attestationSchemas.find((schema) => schema.name === 'Ice cream')
     : attestationSchemas.find((schema) =>
         cleanText.includes(schema.name.toLowerCase())
       );
+
+  if (matchedSchema) {
+    return matchedSchema;
+  }
+
+  const llmSchema = await getLLMSchema(cleanText);
+
+  if (llmSchema) {
+    return attestationSchemas.find(
+      (schema) => schema.name.toLowerCase() === llmSchema.toLowerCase()
+    );
+  }
 }
