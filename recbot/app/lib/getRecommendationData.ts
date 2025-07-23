@@ -1,4 +1,4 @@
-import { type User } from '@neynar/nodejs-sdk/build/neynar-api/v2';
+import { type User } from './types';
 import { getSchema } from './getSchema';
 import { canFnameAttestToSchema } from './utils';
 
