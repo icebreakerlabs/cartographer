@@ -82,12 +82,16 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         castData,
       });
 
-      await neynar.publishCast({
+      const options = {
         signerUuid: NEYNAR_SIGNER_UUID,
         text: castData.text,
         embeds: castData.embeds,
         parent: webhook.data.hash,
-      });
+      };
+
+      console.log('Publishing cast:', options);
+
+      await neynar.publishCast(options);
     } catch (err) {
       console.error(err);
       return (err as Error).message;
