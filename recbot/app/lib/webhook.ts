@@ -9,8 +9,8 @@ import {
   getEthAddressForFname,
   getEthAddressForUser,
   ICEBREAKER_API_URL,
-  neynarClient,
 } from './utils';
+import { neynar } from './neynar';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
 import { getReplyCastData } from './getReplyCastData';
@@ -20,7 +20,7 @@ const NEYNAR_SIGNER_UUID = process.env.NEYNAR_SIGNER_UUID ?? '';
 export async function extractEndorsementFromCast(webhook: WebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
   const parentAuthorFname = parentAuthorFid
-    ? (await neynarClient.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]
+    ? (await neynar.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]
         ?.username
     : undefined;
 
@@ -82,7 +82,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         castData,
       });
 
-      await neynarClient.publishCast({
+      await neynar.publishCast({
         signerUuid: NEYNAR_SIGNER_UUID,
         text: castData.text,
         embeds: castData.embeds,
@@ -100,7 +100,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         castData,
       });
 
-      await neynarClient.publishCast({
+      await neynar.publishCast({
         signerUuid: NEYNAR_SIGNER_UUID,
         text: castData.text,
         parent: webhook.data.hash,

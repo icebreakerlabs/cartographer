@@ -1,4 +1,3 @@
-import { NeynarAPIClient, Configuration } from '@neynar/nodejs-sdk';
 import {
   type IcebreakerCredential,
   type AttestationSchema,
@@ -10,11 +9,6 @@ export const ICEBREAKER_API_URL = 'https://app.icebreaker.xyz/api';
 
 export const ICEBREAKER_CREDENTIALS_URL =
   'https://app.icebreaker.xyz/credentials';
-export const neynarClient = new NeynarAPIClient(
-  new Configuration({
-    apiKey: process.env.NEYNAR_API_KEY ?? '',
-  })
-);
 
 export const getEthAddressForUser = async (user: User) => {
   const icebreakerUser = await getIcebreakerProfileFromFname(user.username);
