@@ -10,6 +10,7 @@ export type AttestationSource =
   | 'Delegate_v1'
   | 'Delegate_v2'
   | 'Farcaster'
+  | 'X'
   | 'Jomo';
 
 export type AttestationSchema = {
@@ -110,7 +111,7 @@ export type IcebreakerStoreCredentialsParams = {
   data?: string;
 };
 
-export type WebhookData = {
+export type NeynarWebhookData = {
   created_at: number;
   type: string;
   data: {
@@ -140,4 +141,16 @@ export type WebhookData = {
     mentioned_profiles: User[];
     event_timestamp: string;
   };
+};
+
+export type ProcessBodyObject = {
+  type: string;
+  postId: string;
+  authorUsername: string;
+  parentPostId: string | null;
+  parentAuthorUsername: string | null;
+  text: string;
+  timestamp: string;
+  mentionedUsernames: string[];
+  channelType: string;
 };

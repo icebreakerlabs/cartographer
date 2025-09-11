@@ -3,7 +3,7 @@ import { createHmac } from 'crypto';
 import { type NextRequest } from 'next/server';
 import {
   type IcebreakerStoreCredentialsParams,
-  type WebhookData,
+  type NeynarWebhookData,
 } from './types';
 import {
   getEthAddressForFname,
@@ -13,18 +13,22 @@ import {
 import { neynar } from './neynar';
 import { getRecommendationData } from './getRecommendationData';
 import { attestationSchemas } from './attestationSchemas';
-import { getReplyCastData } from './getReplyCastData';
+import { getReplyPostData } from './getReplyPostData';
 
 const NEYNAR_SIGNER_UUID = process.env.NEYNAR_SIGNER_UUID ?? '';
 
-export async function extractEndorsementFromCast(webhook: WebhookData) {
+export async function extractEndorsementFromCast(webhook: NeynarWebhookData) {
   const parentAuthorFid = webhook.data.parent_author?.fid;
   const parentAuthorFname = parentAuthorFid
     ? (await neynar.fetchBulkUsers({ fids: [parentAuthorFid] })).users[0]
         ?.username
     : undefined;
 
-  const { isValid, attesteeFname, schemaName } = await getRecommendationData(
+  const {
+    isValid,
+    attesteeUsername: attesteeFname,
+    schemaName,
+  } = await getRecommendationData(
     webhook.data.text,
     webhook.data.mentioned_profiles,
     webhook.data.author.username,
@@ -65,7 +69,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
         body: JSON.stringify(json),
       });
 
-      const castData = getReplyCastData(
+      const castData = getReplyPostData(
         isValid,
         schemaName,
         schema?.requiredSchemaName,
@@ -98,8 +102,8 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
     }
   } else {
     try {
-      const castData = getReplyCastData(isValid, schemaName);
-      console.log('getReplyCastData called with inputs and output:', {
+      const castData = getReplyPostData(isValid, schemaName);
+      console.log('getReplyPostData called with inputs and output:', {
         inputs: { isValid, schemaName },
         castData,
       });
@@ -116,7 +120,7 @@ export async function extractEndorsementFromCast(webhook: WebhookData) {
   }
 }
 
-export async function processWebhookBody(webhook: WebhookData) {
+export async function processWebhookBody(webhook: NeynarWebhookData) {
   if (webhook.type !== 'cast.created' || !webhook.data) {
     throw new Error('Invalid webhook payload');
   }
