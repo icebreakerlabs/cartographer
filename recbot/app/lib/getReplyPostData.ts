@@ -1,6 +1,6 @@
 import { ICEBREAKER_CREDENTIALS_URL } from './utils';
 
-export function getReplyCastData(
+export function getReplyPostData(
   isValidRecommendation: boolean,
   schemaName?: string,
   requiredSchemaName?: string,
